@@ -1,0 +1,20 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+
+# Database Files
+*.duckdb
+*.tmp
+
+# dbt Build Artifacts
+target/
+dbt_packages/
+logs/
+
+# Environment Variables
+.env
