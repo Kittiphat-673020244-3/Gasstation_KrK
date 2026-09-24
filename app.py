@@ -97,3 +97,54 @@ def get_con() -> duckdb.DuckDBPyConnection:
                  "environment variable `GAS_DW_PATH` ให้ชี้ไปที่ `dev.duckdb`")
         st.stop()
     return duckdb.connect(DB_PATH, read_only=True)
+
+
+@st.cache_data(show_spinner=False)
+def q(sql: str, params: tuple | list | None = None) -> pd.DataFrame:
+    return get_con().execute(sql, list(params) if params else []).df()
+
+
+def panel(title: str, why: str = "") -> None:
+    st.markdown(f'<div class="panel"><h4>{title}</h4>'
+                f'<p class="why">{why}</p></div>', unsafe_allow_html=True)
+
+
+def style(fig: go.Figure, height: int = 360, legend_top: bool = True) -> go.Figure:
+    fig.update_layout(
+        height=height, margin=dict(l=8, r=8, t=28, b=8),
+        paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="IBM Plex Sans Thai, IBM Plex Sans, sans-serif", color=INK, size=12.5),
+        hoverlabel=dict(bgcolor=SURFACE, bordercolor=BLUE, font_color=INK),
+        colorway=CATEGORICAL)
+    if legend_top:
+        fig.update_layout(legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0,
+                                       bgcolor="rgba(0,0,0,0)", title_text=""))
+    fig.update_xaxes(gridcolor=GRID, zerolinecolor=BASELINE, linecolor=BASELINE,
+                      tickfont_color=MUTED, title_font_color=INK_SOFT)
+    fig.update_yaxes(gridcolor=GRID, zerolinecolor=BASELINE, linecolor=BASELINE,
+                      tickfont_color=MUTED, title_font_color=INK_SOFT)
+    return fig
+
+
+def kpi(col, label: str, value: str, unit: str = "", sub: str = "") -> None:
+    col.markdown(f'<div class="kpi"><div class="label">{label}</div>'
+                 f'<div class="value">{value}<span class="unit">{unit}</span></div>'
+                 f'<div class="sub">{sub}</div></div>', unsafe_allow_html=True)
+
+
+def guard(df: pd.DataFrame, msg: str = "ไม่มีข้อมูลในเงื่อนไขที่เลือก") -> bool:
+    if df is None or df.empty:
+        st.info(msg)
+        return False
+    return True
+
+
+# ---------------------------------------------------------------------------
+# 4) Sidebar filters
+# ---------------------------------------------------------------------------
+dim_station = q("select gasstation_id, gasstation_name, address from dim_gasstation "
+                "order by gasstation_id")
+dim_prod = q("select product_id, product_name, product_type, is_fuel from dim_product "
+             "order by is_fuel desc, product_id")
+bounds = q("select min(date_day) d0, max(date_day) d1 from dim_date")
+D0, D1 = bounds.iloc[0, 0], bounds.iloc[0, 1]
