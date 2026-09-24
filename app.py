@@ -390,3 +390,170 @@ if guard(pay):
     pay["label"] = pay["label"].fillna(pay["payment_method_key"])
     c1, c2 = st.columns([1.3, 1])
     with c1:
+        fig = go.Figure()
+        pay_sorted = pay.sort_values("total_amount")
+        for i, row in pay_sorted.iterrows():
+            fig.add_trace(go.Bar(
+                x=[row.total_amount], y=["ยอดขาย"], orientation="h", name=row.label,
+                marker_color=BLUE if row.payment_method_key == "cash" else ORANGE,
+                hovertemplate=f"{row.label}<br>%{{x:,.0f}} ₫ · {row.bill_count:,.0f} บิล<extra></extra>"))
+        fig.update_layout(barmode="stack", legend_title_text="วิธีชำระเงิน")
+        fig.update_xaxes(title_text="ยอดขาย (₫)")
+        fig.update_yaxes(title_text="")
+        st.plotly_chart(style(fig, 200, True), width="stretch")
+    with c2:
+        cc_row = pay[pay["payment_method_key"] == "credit card"]
+        cc_amount = cc_row["total_amount"].iloc[0] if not cc_row.empty else 0
+        total_amount = pay["total_amount"].sum()
+        fee = cc_amount * 0.02
+        st.markdown(
+            f'<div class="kpi" style="border-top-color:{ORANGE}">'
+            f'<div class="label">ต้นทุนค่าธรรมเนียมบัตรเครดิตจำลอง (2%)</div>'
+            f'<div class="value">{fee:,.0f}<span class="unit"> ₫</span></div>'
+            f'<div class="sub">คิดเป็น {fee / total_amount * 100:.2f}% ของยอดขายรวม '
+            f'({cc_amount:,.0f} ₫ ชำระด้วยบัตรเครดิต)</div></div>', unsafe_allow_html=True)
+
+# ===========================================================================
+# ส่วนที่ 5 — ประสิทธิภาพบุคลากร
+# ===========================================================================
+panel("ประสิทธิภาพและโครงสร้างกำลังพล",
+      "Scatter เปรียบเทียบยอดขายต่อพนักงาน (แกน Y) กับภาระงานต่อพนักงานเติมน้ำมัน 1 คน (แกน X) "
+      "จุดมุมขวาบนคือสถานีที่มีประสิทธิภาพสูงและภาระงานหนัก "
+      "โครงสร้างตำแหน่งงานและพนักงานออกบิลสูงสุดของสถานีที่เลือกแสดงเป็นตารางด้านล่าง")
+
+rev = q("""
+    select gasstation_id, sum(total_amount) as total_sales, count(*) as invoice_count
+    from fact_invoice where gasstation_id = any(?) and date_key between ? and ?
+    group by 1
+""", (S, k0, k1))
+head = q("""
+    select home_gasstation_id as gasstation_id, count(*) as total_employees,
+           sum(case when position = 'Pump Attendant' then 1 else 0 end) as pump_attendant_count
+    from dim_employee where home_gasstation_id = any(?)
+    group by 1
+""", (S,))
+eff = (rev.merge(head, on="gasstation_id", how="inner")
+       .merge(dim_station[["gasstation_id", "gasstation_name"]], on="gasstation_id"))
+eff["revenue_per_employee"] = eff["total_sales"] / eff["total_employees"].replace(0, pd.NA)
+eff["invoices_per_attendant"] = eff["invoice_count"] / eff["pump_attendant_count"].replace(0, pd.NA)
+eff = eff.dropna(subset=["revenue_per_employee", "invoices_per_attendant"])
+
+if guard(eff):
+    med_x, med_y = eff["invoices_per_attendant"].median(), eff["revenue_per_employee"].median()
+    fig = go.Figure(go.Scatter(
+        x=eff.invoices_per_attendant, y=eff.revenue_per_employee, mode="markers",
+        marker=dict(size=eff.total_employees, sizemode="area",
+                    sizeref=2. * eff.total_employees.max() / (34 ** 2), sizemin=5,
+                    color=BLUE, opacity=.75, line=dict(width=1, color=SURFACE)),
+        customdata=eff[["gasstation_name", "total_employees", "pump_attendant_count"]].values,
+        hovertemplate="<b>%{customdata[0]}</b><br>ยอดขาย/พนักงาน %{y:,.0f} ₫<br>"
+                      "บิล/พนักงานเติมน้ำมัน %{x:,.1f}<br>พนักงานทั้งหมด %{customdata[1]} คน "
+                      "(เติมน้ำมัน %{customdata[2]} คน)<extra></extra>"))
+    fig.add_vline(x=med_x, line_dash="dot", line_color=MUTED)
+    fig.add_hline(y=med_y, line_dash="dot", line_color=MUTED)
+    fig.update_xaxes(title_text="จำนวนบิล ต่อ พนักงานเติมน้ำมัน 1 คน (ภาระงาน)")
+    fig.update_yaxes(title_text="ยอดขายต่อพนักงาน 1 คน (₫)")
+    st.plotly_chart(style(fig, 400, False), width="stretch")
+
+    opts = eff.sort_values("total_sales", ascending=False)["gasstation_name"].tolist()
+    sel = st.selectbox("ดูรายละเอียดตำแหน่งงานและพนักงานออกบิลสูงสุดของสถานี", opts, key="staff_detail")
+    sid = int(dim_station.loc[dim_station.gasstation_name == sel, "gasstation_id"].iloc[0])
+
+    d1, d2 = st.columns(2)
+    with d1:
+        st.caption(f"โครงสร้างตำแหน่งงาน — {sel}")
+        pos = q("""select position, count(*) as headcount from dim_employee
+                   where home_gasstation_id = ? group by 1 order by 2 desc""", (sid,))
+        pos["สัดส่วน"] = (pos["headcount"] / pos["headcount"].sum() * 100).round(1).astype(str) + "%"
+        st.dataframe(pos.rename(columns={"position": "ตำแหน่ง", "headcount": "จำนวน (คน)"}),
+                     width="stretch", hide_index=True)
+    with d2:
+        st.caption(f"พนักงานออกบิลสูงสุด — {sel}")
+        top_emp = q("""
+            select e.employee_name as ชื่อพนักงาน, e.position as ตำแหน่ง,
+                   count(*) as "จำนวนบิล"
+            from fact_invoice f join dim_employee e on f.employee_id = e.employee_id
+            where f.gasstation_id = ? and f.date_key between ? and ?
+            group by 1, 2 order by 3 desc limit 5
+        """, (sid, k0, k1))
+        st.dataframe(top_emp, width="stretch", hide_index=True)
+
+# ===========================================================================
+# ส่วนที่ 6 — สุขภาพถังเก็บน้ำมัน
+# ===========================================================================
+panel("ระดับน้ำมันคงเหลือในถัง (ข้อมูล ณ ปัจจุบัน)",
+      "แท่งวัดระดับเทียบเกณฑ์ เส้นประคือเกณฑ์เตือนภัยที่ 20% ของความจุ "
+      "แท่งที่ต่ำกว่าเส้นถูกเน้นด้วยสีแดง ส่วนถังปกติใช้สีน้ำเงินตามระบบ "
+      "ไม่ผูกกับช่วงวันที่ที่เลือกด้านบน เพราะเป็นค่าล่าสุด ณ ขณะนี้ ไม่ใช่ตัวเลขสะสมย้อนหลัง")
+
+tanks = q("""
+    select tank_id, gasstation_id, tank_name, capacity_liters, current_quantity,
+           current_quantity / nullif(capacity_liters, 0) as fill_ratio
+    from dim_tank
+    where gasstation_id = any(?)
+    order by fill_ratio asc
+""", (S,))
+
+if guard(tanks):
+    low = tanks.head(20).sort_values("fill_ratio", ascending=False)
+    colors = [STATUS_CRIT if v < 0.2 else BLUE for v in low.fill_ratio]
+    fig = go.Figure(go.Bar(
+        x=low.fill_ratio * 100, y=low.tank_name.astype(str) + " · สถานี " + low.gasstation_id.astype(str),
+        orientation="h", marker_color=colors,
+        customdata=low[["current_quantity", "capacity_liters"]].values,
+        hovertemplate="%{y}<br>%{x:.1f}%% ของความจุ<br>เหลือ %{customdata[0]:,.0f} / "
+                      "%{customdata[1]:,.0f} ลิตร<extra></extra>"))
+    fig.add_vline(x=20, line_color=STATUS_CRIT, line_dash="dash",
+                  annotation_text="เกณฑ์เตือนภัย 20%", annotation_font_color=STATUS_CRIT)
+    n_below = int((tanks.fill_ratio < 0.2).sum())
+    if n_below:
+        st.warning(f"มีถังทั้งหมด {n_below} ใบ (จาก {len(tanks)} ใบในขอบเขตที่เลือก) "
+                   "ที่ระดับน้ำมันต่ำกว่าเกณฑ์เตือนภัย 20%")
+    fig.update_xaxes(title_text="% ของความจุถัง", range=[0, max(100, low.fill_ratio.max() * 105)])
+    fig.update_yaxes(title_text="")
+    st.plotly_chart(style(fig, 460, False), width="stretch")
+
+# ===========================================================================
+# ส่วนที่ 7 — การกระทบยอด จ่ายออก vs ขายจริง
+# ===========================================================================
+panel("ส่วนต่างปริมาณจ่ายออกจากถัง เทียบ ยอดขายจริง",
+      "แท่งสองทิศทางรอบเส้นศูนย์ แท่งเกินศูนย์ (น้ำเงิน) หมายถึงจ่ายออกมากกว่าขาย "
+      "แท่งต่ำกว่าศูนย์ (แดง) หมายถึงขายมากกว่าที่บันทึกว่าจ่ายออก ซึ่งเป็นจุดที่ควรตรวจสอบเพิ่มเติม")
+
+recon = q("""
+    with sold as (
+        select date_key, sum(quantity_sold) as qty_sold
+        from fact_sales where gasstation_id = any(?) and product_id = any(?)
+          and date_key between ? and ? group by 1
+    ),
+    dispensed as (
+        select date_key, sum(quantity_out) as qty_out
+        from fact_inventory_transaction
+        where gasstation_id = any(?) and date_key between ? and ? group by 1
+    )
+    select coalesce(s.date_key, d.date_key) as date_key,
+           coalesce(s.qty_sold, 0) as qty_sold, coalesce(d.qty_out, 0) as qty_out,
+           coalesce(d.qty_out, 0) - coalesce(s.qty_sold, 0) as variance
+    from sold s full outer join dispensed d on s.date_key = d.date_key
+    order by 1
+""", (S, P, k0, k1, S, k0, k1))
+
+if guard(recon):
+    recon["date_day"] = pd.to_datetime(recon["date_key"], format="%Y%m%d")
+    fig = go.Figure(go.Bar(
+        x=recon.date_day, y=recon.variance,
+        marker_color=[BLUE if v >= 0 else RED_HUE for v in recon.variance],
+        customdata=recon[["qty_sold", "qty_out"]].values,
+        hovertemplate="%{x|%d %b}<br>ส่วนต่าง %{y:+,.0f} ลิตร<br>ขาย %{customdata[0]:,.0f} · "
+                      "จ่ายออก %{customdata[1]:,.0f}<extra></extra>"))
+    fig.add_hline(y=0, line_color=BASELINE, line_width=1.5)
+    fig.update_xaxes(title_text="")
+    fig.update_yaxes(title_text="ส่วนต่าง (ลิตร) = จ่ายออก − ขาย")
+    st.plotly_chart(style(fig, 340, False), width="stretch")
+    st.caption("หมายเหตุ: ส่วนต่างเป็นจุดให้ตรวจสอบเพิ่มเติม ไม่ใช่ข้อสรุปว่ามีน้ำมันสูญหายเสมอไป")
+
+st.markdown(f'<div style="text-align:center;color:{MUTED};font-size:.78rem;padding-top:18px;'
+            f'border-top:1px solid {BORDER};margin-top:22px">Fuel Station Analytics Report · '
+            f'Star Schema (dbt + DuckDB) · ข้อมูลจากตาราง Dimension / Fact / Intermediate เท่านั้น</div>',
+            unsafe_allow_html=True)
+    
