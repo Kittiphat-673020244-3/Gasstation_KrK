@@ -47,3 +47,53 @@ RED_HUE = CATEGORICAL[7]
 
 SEQ_BLUE = ["#cde2fb", "#9ec5f4", "#5598e7", "#2a78d6", "#184f95"]
 DIVERGING = [[0.0, "#e34948"], [0.5, "#f0efec"], [1.0, "#2a78d6"]]
+
+STATUS_GOOD, STATUS_WARN, STATUS_SERIOUS, STATUS_CRIT = "#0ca30c", "#fab219", "#ec835a", "#d03b3b"
+
+WEEKDAY_TH = {"Monday": "จันทร์", "Tuesday": "อังคาร", "Wednesday": "พุธ",
+              "Thursday": "พฤหัสบดี", "Friday": "ศุกร์", "Saturday": "เสาร์", "Sunday": "อาทิตย์"}
+WEEKDAY_ORDER = ["จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์", "อาทิตย์"]
+
+st.set_page_config(page_title="Fuel Station Analytics Report", page_icon="⛽",
+                    layout="wide", initial_sidebar_state="expanded")
+
+st.markdown(f"""
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body, [class*="css"] {{ font-family: "IBM Plex Sans Thai", "IBM Plex Sans", sans-serif; }}
+  .stApp {{ background: {PAGE}; color: {INK}; }}
+  [data-testid="stSidebar"] {{ background: {SURFACE}; border-right: 1px solid {BORDER}; }}
+  [data-testid="stHeader"] {{ background: transparent; }}
+  .block-container {{ padding-top: 1.4rem; padding-bottom: 3rem; max-width: 1440px; }}
+  h1, h2, h3, h4 {{ color: {INK}; font-weight: 700; letter-spacing: .1px; }}
+  .report-header {{ background: {SURFACE}; border: 1px solid {BORDER}; border-radius: 10px; padding: 22px 28px; margin-bottom: 20px; border-left: 4px solid {BLUE}; }}
+  .report-header h1 {{ margin: 0; font-size: 1.5rem; }}
+  .report-header p {{ margin: 6px 0 0; color: {INK_SOFT}; font-size: .92rem; }}
+  .report-header .meta {{ color: {MUTED}; font-size: .8rem; margin-top: 10px; }}
+  .kpi {{ background: {SURFACE}; border: 1px solid {BORDER}; border-top: 3px solid {BLUE}; border-radius: 8px; padding: 14px 16px; height: 100%; }}
+  .kpi .label {{ color: {MUTED}; font-size: .74rem; font-weight: 600; letter-spacing: .3px; text-transform: uppercase; }}
+  .kpi .value {{ color: {INK}; font-size: 1.5rem; font-weight: 700; margin-top: 4px; line-height: 1.2; }}
+  .kpi .unit {{ font-size: .8rem; color: {MUTED}; font-weight: 500; margin-left: 3px; }}
+  .kpi .sub {{ font-size: .76rem; color: {INK_SOFT}; margin-top: 4px; }}
+  .panel {{ background: {SURFACE}; border: 1px solid {BORDER}; border-radius: 10px; padding: 18px 20px 8px; margin-bottom: 18px; }}
+  .panel h4 {{ margin: 0 0 4px; font-size: 1.02rem; font-weight: 700; }}
+  .panel .why {{ color: {MUTED}; font-size: .80rem; margin: 4px 0 12px; line-height: 1.5; }}
+  [data-testid="stDataFrame"] {{ border: 1px solid {BORDER}; border-radius: 8px; }}
+  .stAlert {{ border-radius: 8px; }}
+  footer, #MainMenu {{ visibility: hidden; }}
+</style>
+""", unsafe_allow_html=True)
+
+
+# ---------------------------------------------------------------------------
+# 3) Data access
+# ---------------------------------------------------------------------------
+@st.cache_resource(show_spinner=False)
+def get_con() -> duckdb.DuckDBPyConnection:
+    if not os.path.exists(DB_PATH):
+        st.error(f"ไม่พบไฟล์ฐานข้อมูล: `{DB_PATH}`\n\n"
+                 "รัน `dbt run` ในโฟลเดอร์ `Gasstation_dw_duckdb` ก่อน หรือกำหนด "
+                 "environment variable `GAS_DW_PATH` ให้ชี้ไปที่ `dev.duckdb`")
+        st.stop()
+    return duckdb.connect(DB_PATH, read_only=True)
