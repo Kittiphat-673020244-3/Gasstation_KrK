@@ -359,9 +359,8 @@ Data Mart แต่ละตารางจัดเตรียมข้อม�
 
 ```bash
 cd Gasstation_dw_duckdb
-dbt seed
+dbt debug
 dbt run
-dbt test
 cd ..
 streamlit run app.py
 ```
@@ -387,9 +386,8 @@ python load_raw.py
 สร้างและตรวจสอบคลังข้อมูล โดยรันตามลำดับ และแก้ไขข้อผิดพลาดของแต่ละขั้นก่อนดำเนินการต่อ
 
 ```bash
-dbt seed
+dbt debug
 dbt run
-dbt test
 ```
 
 กลับไปยังโฟลเดอร์หลักเพื่อเปิดแดชบอร์ด
