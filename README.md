@@ -148,3 +148,82 @@ Gasstation_KRK/
 15. ความจุถังเก็บ (`capacity`) ของแต่ละสาขาเพียงพอต่อยอดขายเฉลี่ยต่อวันหรือไม่ (วิเคราะห์ความเสี่ยงน้ำมันหมด)?
 
 ---
+
+## 4.Data Cube Diagram
+* [คลิกที่นี่เพื่อเปิดดู ER Diagram บน Google Drive](https://drive.google.com/file/d/1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq/view?usp=sharing)
+
+![Operational ER Diagram](Data_Model_Diagram.drawio.png)
+
+
+## Interactive Web Application & Analytics Dashboard
+
+โปรเจกต์นี้ได้รับการพัฒนาและเปิดให้เข้าใช้งานผ่าน Streamlit Web Application ที่รวมทั้งระบบตรวจเช็กคลังข้อมูล (DW Inspector) และแดชบอร์ดวิเคราะห์ธุรกิจ (Executive Analytics) ไว้ในระบบเดียว:
+
+* **Live Demo Web Application:** [เข้าใช้งาน GasStation Enterprise DW & Analytics Studio](https://kdvxcyh5deojv4aewtnmwb.streamlit.app/)
+<img width="1816" height="2362" alt="ไม่มีชื่อเรื่อง" src="https://github.com/user-attachments/assets/e06befc2-dae0-42ca-a1ac-9d681171445a" />
+
+---
+
+## โครงสร้างฟังก์ชันการทำงานบน Web Application
+
+
+
+| โมดูล / แท็บ (Tab) | วัตถุประสงค์ (Business Purpose) |
+| :--- | :--- |
+| **1. DW Table Inspector** | ตรวจสอบข้อมูลดิบ โครงสร้างเมตาเดตา (Schema Metadata) และทดสอบรัน SQL Console บน DuckDB |
+| **2. Sales & Revenue Analytics** | สรุปรายงานวิเคราะห์ยอดขายและรายได้สถิติประจำสาขา ชนิดน้ำมัน และช่วงเวลา (Q1 - Q5) |
+| **3. Inventory Operations** | ติดตามระดับน้ำมันคงเหลือในถัง อัตราเติมเข้า (Inflow) และจ่ายออก (Outflow) (Q6 - Q10) |
+| **4. Staff & Customer Intelligence** | ประเมินยอดขายตามรายชื่อพนักงาน และพฤติกรรมกลุ่มลูกค้ายานพาหนะ (Q11 - Q15) |
+| **5. Ad-Hoc OLAP Explorer** | เครื่องมือ Slice-and-Dice วิเคราะห์มิติข้อมูลอิสระ (Custom Dimensions) ตามต้องการ |
+
+---
+## GAS STATION INSIGHT
+
+<img width="1414" height="2000" alt="image" src="https://github.com/user-attachments/assets/8b14c466-d902-4294-8662-eb96ee3129bd" />
+
+---
+
+Getting Started / Quick Start Guide (คู่มือติดตั้งและรันโปรเจกต์)
+## Quick Start & Installation
+
+### 1. Prerequisites
+* Python 3.10 ขึ้นไป
+* Git
+
+### 2. Environment Setup
+```bash
+# Clone repository
+git clone [https://github.com/USERNAME/Gasstation_KRK.git](https://github.com/USERNAME/Gasstation_KRK.git)
+cd Gasstation_KRK
+
+# Create and activate virtual environment
+python -m venv .venv
+source .venv/bin/activate  # สำหรับ Windows: .venv\Scripts\activate
+
+# Install required dependencies
+pip install -r requirements.txt
+
+Run Data Pipeline & Application
+# สั่งรันสร้างฐานข้อมูล DuckDB และแปลงโครงสร้างด้วย dbt
+cd Gasstation_dw_duckdb
+python load.py
+dbt run
+
+# สั่งเปิดใช้งาน Web Application
+cd ..
+streamlit run app.py
+---
+
+### 3. Tech Stack & Infrastructure Overview (สรุปเครื่องมือที่ใช้)
+สรุปบทบาทหน้าที่ของเครื่องมือแต่ละชนิดในโปรเจกต์ไว้ในรูปแบบตาราง:
+
+```markdown
+## Tech Stack & Architecture
+
+| Component | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Storage / DW Engine** | DuckDB | OLAP Database ประมวลผลคิวรีความเร็วสูงแบบ In-Memory / File-based |
+| **Transformation Tool** | dbt (data build tool) | ทำการแปลงข้อมูล (ELT) จาก Staging Layer สู่ Data Warehouse (Star Schema) |
+| **Language** | Python 3.10+ | ประมวลผลไฟล์สคริปต์ ดึงข้อมูล และจัดการ Pipeline |
+| **Data Visualization** | Streamlit, Plotly | สร้าง Interactive Web Application และ Dashboard วิเคราะห์ข้อมูล |
+| **Data Modeling** | Draw.io | ออกแบบ Relational ER Diagram และ Data Cube Star Schema |
