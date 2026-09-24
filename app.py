@@ -197,3 +197,51 @@ if not S:
 if not prod_names:
     st.warning("กรุณาเลือกอย่างน้อย 1 สินค้า")
     st.stop()
+
+P = dim_prod.loc[dim_prod["product_name"].isin(prod_names), "product_id"].tolist()
+k0 = int(pd.Timestamp(start_d).strftime("%Y%m%d"))
+k1 = int(pd.Timestamp(end_d).strftime("%Y%m%d"))
+span_days = (pd.Timestamp(end_d) - pd.Timestamp(start_d)).days + 1
+
+# ---------------------------------------------------------------------------
+# 5) Header + KPI row
+# ---------------------------------------------------------------------------
+st.markdown(f"""
+<div class="report-header">
+  <h1>รายงานวิเคราะห์เครือข่ายสถานีบริการน้ำมัน</h1>
+  <p>สรุปยอดขาย พฤติกรรมการซื้อ ประสิทธิภาพบุคลากร และการบริหารคลังน้ำมัน
+     สำหรับ {len(S)} สถานี · {len(P)} สินค้า · {start_d:%d %b %Y} – {end_d:%d %b %Y}
+     ({span_days} วัน)</p>
+  <div class="meta">แหล่งข้อมูล: dim_ / fact_ / int_ tables · dbt + DuckDB</div>
+</div>
+""", unsafe_allow_html=True)
+
+kpi_sql = """
+select coalesce(sum(f.total_amount), 0) as sales_amount,
+       count(*) as bill_count,
+       count(distinct f.customer_id) as customer_count
+from fact_invoice f
+where f.gasstation_id = any(?) and f.date_key between ? and ?
+"""
+cur_k = q(kpi_sql, (S, k0, k1)).iloc[0]
+
+fuel_sql = """
+select coalesce(sum(s.quantity_sold), 0) as fuel_liters
+from fact_sales s join dim_product p on s.product_id = p.product_id
+where p.is_fuel and s.gasstation_id = any(?) and s.product_id = any(?)
+  and s.date_key between ? and ?
+"""
+fuel_liters = q(fuel_sql, (S, P, k0, k1)).iloc[0].fuel_liters
+
+top_station = q("""
+    select g.gasstation_name, sum(f.total_amount) as s
+    from fact_invoice f join dim_gasstation g on f.gasstation_id = g.gasstation_id
+    where f.gasstation_id = any(?) and f.date_key between ? and ?
+    group by 1 order by 2 desc limit 1
+""", (S, k0, k1))
+
+spread = q("""
+    select avg(sales_multiple) as m
+    from mart_09_daily_station_ranking
+    where date_key between ? and ? and sales_multiple is not null
+""", (k0, k1)).iloc[0].m
