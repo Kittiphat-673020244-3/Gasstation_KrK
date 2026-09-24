@@ -1,4 +1,4 @@
-<h1 align="center">⛽ GasStationDB</h1>
+<h1 align="center">GasStationDB</h1>
 
 <p align="center">
   <strong>Data Warehouse & Business Intelligence Project</strong><br>
@@ -15,11 +15,11 @@
 </p>
 
 <p align="center">
-  <a href="https://kdvxcyh5deojv4aewtnmwb.streamlit.app/"><strong>🚀 Live Demo</strong></a>
+  <a href="https://kdvxcyh5deojv4aewtnmwb.streamlit.app/"><strong>Live Demo</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view"><strong>🗂️ OLTP ER Diagram</strong></a>
+  <a href="https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view"><strong>OLTP ER Diagram</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://drive.google.com/file/d/1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq/view?usp=sharing"><strong>⭐ Data Cube / Star Schema</strong></a>
+  <a href="https://drive.google.com/file/d/1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq/view?usp=sharing"><strong>Data Cube / Star Schema</strong></a>
 </p>
 
 > **Repository:** [Gasstation_KRK](https://github.com/Papawadee-Mohdee/Gasstation_KRK/tree/krk_gas)  
@@ -28,7 +28,7 @@
 
 ---
 
-## 📑 Contents
+## Contents
 
 1. [Project Overview](#project-overview)
 2. [Team Members](#team-members)
@@ -45,7 +45,7 @@
 
 ---
 
-## 🎯 Project Overview
+## Project Overview
 
 โครงงานนี้ออกแบบและพัฒนา **คลังข้อมูลสำหรับธุรกิจสถานีบริการน้ำมัน** โดยนำข้อมูลจากระบบปฏิบัติการ (OLTP) เข้าสู่กระบวนการ **Extract, Load, Transform (ELT)** แล้วจัดทำแบบจำลองเชิงมิติสำหรับการวิเคราะห์ (OLAP) ก่อนนำเสนอข้อมูลผ่าน **Streamlit และ Plotly** เพื่อสนับสนุนการตัดสินใจด้านยอดขาย สินค้า การชำระเงิน คลังน้ำมัน และการดำเนินงานของแต่ละสาขา
 
@@ -56,7 +56,7 @@
 - ติดตามระดับน้ำมันคงเหลือและเปรียบเทียบรายการจ่ายออกกับยอดขาย
 - สื่อสารผลการวิเคราะห์ด้วย Interactive Dashboard และตัวกรองที่ผู้ใช้เลือกได้
 
-## 👥 Team Members
+## Team Members
 
 | รหัสนักศึกษา | ชื่อ–นามสกุล | บทบาท |
 |:---:|:---|:---|
@@ -67,7 +67,7 @@
 | **673020266-3** | นางสาวสุพิชญา ผ่องสนาม | Data Quality Engineer |
 | **673020270-2** | นางสาวอาทิติญา ชาชัย | Business Intelligence Analyst |
 
-## 🗃️ Dataset & OLTP
+## Dataset & OLTP
 
 ข้อมูลตั้งต้นของโครงงานคือ **GasStationDB (HCM City – PostgreSQL)** ซึ่งกลุ่มระบุว่ามาจาก Kaggle โดยครอบคลุมข้อมูลธุรกรรมการขาย บุคลากร ลูกค้า สินค้า สถานี และการเคลื่อนไหวน้ำมัน **15 มีนาคม – 7 เมษายน 2024 (24 วัน ตามคำอธิบายชุดข้อมูลของกลุ่ม)**
 
@@ -77,11 +77,22 @@
 | Sales Transactions | `Invoice`, `InvoiceDetail` | หัวบิล รายการสินค้า ยอดขาย และวิธีชำระเงิน |
 | Inventory Transactions | `StorageTank`, `InventoryTransaction` | ความจุถัง ปริมาณรับเข้า จ่ายออก และคงเหลือ |
 
-**เอกสารต้นทาง:** [เปิดดู OLTP ER Diagram บน Google Drive](https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view)
+### Operational ER Diagram
+
+แบบจำลองฐานข้อมูลต้นทาง (OLTP) แสดงความสัมพันธ์ระหว่างข้อมูลสถานี พนักงาน ลูกค้า สินค้า ใบแจ้งหนี้ รายการขาย ถังเก็บ และธุรกรรมคลังน้ำมัน
+
+<p align="center">
+  <a href="https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view" target="_blank">
+    <img src="https://drive.google.com/thumbnail?id=1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH&sz=w1600" alt="GasStationDB Operational ER Diagram" width="900">
+  </a>
+</p>
+
+<p align="center"><em>Operational ER Diagram — คลิกที่ภาพเพื่อเปิดไฟล์ต้นฉบับบน Google Drive</em></p>
+**[เปิดดู Operational ER Diagram บน Google Drive](https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view)**
 
 > **หมายเหตุด้านแหล่งข้อมูล:** ก่อนส่งงานฉบับสุดท้าย ควรเพิ่มลิงก์หน้า Dataset บน Kaggle ที่ตรงกับชุดข้อมูลต้นฉบับ เพื่อให้ตรวจสอบที่มาและเงื่อนไขการใช้งานได้
 
-## 🔄 Data Architecture & ELT
+## Data Architecture & ELT
 
 ```mermaid
 flowchart LR
@@ -101,7 +112,7 @@ flowchart LR
 
 เมื่อเปิดแอปครั้งแรก หากยังไม่มีฐานข้อมูลที่สมบูรณ์ `warehouse_setup.py` จะโหลด CSV และเรียก dbt เพื่อสร้าง `Gasstation_dw_duckdb/dev.duckdb` อัตโนมัติ โดยไม่เขียนทับฐานข้อมูลเดิมที่ไม่สมบูรณ์
 
-## ⭐ Star Schema & Data Cube
+## Star Schema & Data Cube
 
 **แบบจำลองคลังข้อมูลจริงในสาขา `krk_gas`:**
 
@@ -115,11 +126,22 @@ flowchart LR
 | Dimension | `dim_customer`, `dim_employee` | ข้อมูลลูกค้าและพนักงาน |
 | Dimension | `dim_products`, `dim_tanks` | ข้อมูลสินค้าและถังเก็บ |
 
-**เอกสารแบบจำลอง:** [เปิดดู Data Cube / Star Schema Diagram บน Google Drive](https://drive.google.com/file/d/1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq/view?usp=sharing)
+### Data Model Diagram / Data Cube
+
+แผนภาพนี้แสดงโครงสร้างคลังข้อมูลสำหรับการวิเคราะห์ โดยเชื่อม Fact Tables เข้ากับ Dimension Tables เพื่อรองรับการวิเคราะห์ยอดขาย สินค้า ลูกค้า พนักงาน เวลา สถานี และคลังน้ำมัน
+
+<p align="center">
+  <a href="https://drive.google.com/file/d/1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq/view?usp=sharing" target="_blank">
+    <img src="https://drive.google.com/thumbnail?id=1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq&sz=w1600" alt="GasStationDB Data Model Diagram" width="900">
+  </a>
+</p>
+
+<p align="center"><em>Data Model / Data Cube Diagram — คลิกที่ภาพเพื่อเปิดไฟล์ต้นฉบับบน Google Drive</em></p>
+**[เปิดดู Data Model / Data Cube Diagram บน Google Drive](https://drive.google.com/file/d/1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq/view?usp=sharing)**
 
 > **ข้อควรระวังในการสรุปข้อมูล:** ห้ามรวม `total_amount` จากหัวบิลซ้ำตามจำนวนรายการสินค้า และไม่ควรนำ `remaining_quantity` ของถังเดียวกันมาบวกข้ามเวลา ให้ใช้ยอดคงเหลือจากธุรกรรมล่าสุดตามวันที่เลือก
 
-## 🗂️ Project Structure
+## Project Structure
 
 โครงสร้างต่อไปนี้อ้างอิงไฟล์ที่มีอยู่ในสาขา `krk_gas` (ไม่รวมไฟล์ที่สร้างขึ้นเองระหว่างติดตั้ง เช่น `.venv/` และ `dev.duckdb`)
 
@@ -176,7 +198,7 @@ Gasstation_KRK/
 └── README.md
 ```
 
-## 💡 15 Business Questions
+## 15 Business Questions
 
 โจทย์วิเคราะห์ทางธุรกิจทั้ง 15 ข้อตามขอบเขตโครงงาน แบ่งเป็น 5 กลุ่ม โดย **โจทย์ที่ระบุด้านล่างเป็นขอบเขตการวิเคราะห์ ไม่ได้หมายความว่าทุกข้อมีกราฟสำเร็จรูปในแอปปัจจุบัน**
 
@@ -220,7 +242,7 @@ Gasstation_KRK/
 | **Q14** | สาขาใดมีรายได้สูงสุด/ต่ำสุดเมื่อเปรียบเทียบตามช่วงเวลา? |
 | **Q15** | ความจุถังเก็บของแต่ละสาขารองรับยอดขายเฉลี่ยต่อวันได้เพียงพอหรือไม่? |
 
-## 📊 Interactive Dashboard
+## Interactive Dashboard
 
 **Live Demo:** [GasStation Enterprise DW & Analytics Studio](https://kdvxcyh5deojv4aewtnmwb.streamlit.app/)
 
@@ -242,14 +264,14 @@ Gasstation_KRK/
 <p align="center"><em>ภาพตัวอย่าง Web Application ที่กลุ่มจัดเตรียม</em></p>
 
 <details>
-<summary><strong>🖼️ ดูภาพเพิ่มเติม: GAS STATION INSIGHT</strong></summary>
+<summary><strong>ดูภาพเพิ่มเติม: GAS STATION INSIGHT</strong></summary>
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/8b14c466-d902-4294-8662-eb96ee3129bd" alt="Gas Station Insight dashboard overview" width="700">
 </p>
 </details>
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -300,7 +322,7 @@ dbt test --profiles-dir .
 
 **ใช้ฐานข้อมูล DuckDB ที่มีอยู่แล้ว (ทางเลือก):** ตั้งค่า `GASSTATION_DB` ให้ชี้ไปยังไฟล์ที่มี Fact/Dimension ครบ ก่อนรัน `streamlit run app.py`
 
-## 🧰 Technology Stack
+## Technology Stack
 
 | Component | Technology | Purpose |
 |:---|:---|:---|
@@ -314,7 +336,7 @@ dbt test --profiles-dir .
 
 เวอร์ชัน Python packages ข้างต้นอ้างอิงจาก `requirements.txt` ในสาขา `krk_gas`
 
-## 🔎 Data Limitations & Next Steps
+## Data Limitations & Next Steps
 
 - **ช่วงเวลาข้อมูลสั้น:** ข้อมูล 24 วันไม่เพียงพอสำหรับการวิเคราะห์การเลิกซื้อซ้ำในรอบ **3–6 เดือน (Q7)** และการสรุปแนวโน้มระยะยาว
 - **ข้อมูลต้นทุนยังไม่ชัดเจน:** ตาราง `Product` มี `Supplier` และ `UnitPrice` แต่ไม่ควรใช้ `UnitPrice` เป็น *ต้นทุนจัดซื้อ* โดยไม่มีการยืนยันเพิ่มเติม จึงยังไม่ควรสรุป Profit Margin ตาม Q13
@@ -323,7 +345,7 @@ dbt test --profiles-dir .
 - **หน่วยเงิน:** ก่อนเผยแพร่ผลวิเคราะห์ ควรตรวจสอบสกุลเงินของชุดข้อมูลต้นฉบับ และทำป้ายกำกับทุกกราฟให้สอดคล้องกัน
 - **ส่วนขยายที่เสนอ:** เพิ่ม **DW Table Inspector / SQL Console** และ **Ad-Hoc OLAP Explorer** หลังพัฒนาและทดสอบเสร็จ (ยังไม่ใช่เมนูที่มีใน `app.py` สาขานี้)
 
-## 📄 License
+## License
 
 โปรเจกต์นี้เผยแพร่โค้ดภายใต้ [MIT License](LICENSE) ตามไฟล์ `LICENSE` ใน Repository โดยสิทธิในการใช้ชุดข้อมูลและรูปภาพต้นทางให้เป็นไปตามเงื่อนไขของเจ้าของข้อมูลแต่ละแหล่ง
 
