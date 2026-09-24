@@ -29,3 +29,17 @@
 | **673020270-2** | นางสาวอาทิติญา ชาชัย | Business Intelligence Analyst[cite: 1, 3] |
 
 ---
+
+## 1. Operational Database (OLTP)
+
+* **ชุดข้อมูลต้นทาง:** GasStationDB (HCM City - PostgreSQL) จาก Kaggle[cite: 2]
+* **ขอบเขตระบบ:** บันทึกธุรกรรมการขายน้ำมันประจำวัน การจัดการคลังน้ำมัน หัวจ่าย พนักงาน และลูกค้า รวม 24 วัน (15 มีนาคม – 7 เมษายน 2024)[cite: 2]
+* **ER Diagram ต้นทาง:** [คลิกเปิดดู ER Diagram บน Google Drive](https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view)
+
+![Operational ER Diagram](ER_Diagram.drawio.png)
+
+แบบจำลองฐานข้อมูลเชิงสัมพันธ์นี้ ออกแบบเพื่อรองรับการดำเนินงานบริหารจัดการสถานีบริการน้ำมัน ครอบคลุมกระบวนการขาย บุคลากรประจำสาขา และปริมาณน้ำมันคงคลัง[cite: 2] แบ่งเป็น 3 กลุ่มหลัก:
+
+1. **กลุ่มข้อมูลหลักและโครงสร้างสาขา (Master Data & Infrastructure):** `gasstation`, `employee`, `customer`, `product`[cite: 2]
+2. **กลุ่มธุรกรรมงานขาย (Sales Transactions):** `invoice`, `invoicedetail`[cite: 2]
+3. **กลุ่มคลังและการเคลื่อนไหวน้ำมันเชื้อเพลิง (Inventory Transactions):** `storagetank`, `inventorytransaction`[cite: 2]
