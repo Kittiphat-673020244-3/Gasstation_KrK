@@ -258,11 +258,6 @@ Gasstation_KRK/
 
 ตัวกรองของแอปประกอบด้วย **ช่วงวันที่ · สายถนน · สถานี** เพื่อให้เปรียบเทียบพื้นที่และเจาะลึกรายสาขาได้ โดยกลุ่มพื้นที่ใช้ **สายถนนจากข้อมูลจริง** ไม่ใช่ Business Region ที่กำหนดขึ้นเอง
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/e06befc2-dae0-42ca-a1ac-9d681171445a" alt="GasStation Analytics Dashboard screenshot" width="780">
-</p>
-<p align="center"><em>ภาพตัวอย่าง Web Application ที่กลุ่มจัดเตรียม</em></p>
-
 <details>
 <summary><strong>ดูภาพเพิ่มเติม: GAS STATION INSIGHT</strong></summary>
 
