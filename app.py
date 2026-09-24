@@ -148,3 +148,52 @@ dim_prod = q("select product_id, product_name, product_type, is_fuel from dim_pr
              "order by is_fuel desc, product_id")
 bounds = q("select min(date_day) d0, max(date_day) d1 from dim_date")
 D0, D1 = bounds.iloc[0, 0], bounds.iloc[0, 1]
+
+with st.sidebar:
+    st.markdown(f'<div style="font-size:1.1rem;font-weight:700;color:{INK}">⛽ Fuel Analytics</div>'
+                f'<div style="color:{MUTED};font-size:.76rem;margin-bottom:14px">'
+                f'Star Schema · DuckDB · dbt</div>', unsafe_allow_html=True)
+
+    st.markdown("##### ช่วงวันที่")
+    dr = st.date_input("ช่วงวันที่", value=(D0, D1), min_value=D0, max_value=D1,
+                        label_visibility="collapsed")
+    start_d, end_d = dr if isinstance(dr, (tuple, list)) and len(dr) == 2 else (D0, D1)
+
+    rank_st = q("""
+        select gasstation_id, sum(total_amount) as sales_amount
+        from fact_invoice group by 1 order by 2 desc
+    """)
+    rank_st = rank_st.merge(dim_station, on="gasstation_id")
+
+    st.markdown("##### สถานีบริการ")
+    st.caption(f"คลังข้อมูลมี {len(dim_station):,} สถานี")
+    scope = st.radio("ขอบเขต", ["Top 10 ตามยอดขาย", "Top 25 ตามยอดขาย", "ทั้งหมด", "เลือกเอง"],
+                      label_visibility="collapsed")
+
+    if scope == "ทั้งหมด":
+        S = dim_station["gasstation_id"].tolist()
+    elif scope.startswith("Top"):
+        n = int(scope.split()[1])
+        S = rank_st.head(n)["gasstation_id"].tolist()
+    else:
+        picked = st.multiselect("เลือกสถานี", dim_station["gasstation_name"].tolist(),
+                                 default=rank_st.head(5)["gasstation_name"].tolist())
+        S = dim_station.loc[dim_station["gasstation_name"].isin(picked), "gasstation_id"].tolist()
+
+    st.markdown("##### สินค้า")
+    fuel_only = st.toggle("เฉพาะน้ำมันเชื้อเพลิง", value=True)
+    pool = dim_prod[dim_prod["is_fuel"]] if fuel_only else dim_prod
+    prod_names = st.multiselect("สินค้า", pool["product_name"].tolist(),
+                                 default=pool["product_name"].tolist(),
+                                 label_visibility="collapsed")
+
+    st.divider()
+    st.caption("ข้อมูลอ้างอิงจากตาราง dim_ / fact_ / int_ ใน dbt warehouse โดยตรง "
+               "กราฟตอบสนองตามช่วงวันที่และสถานีที่เลือกด้านบน")
+
+if not S:
+    st.warning("กรุณาเลือกอย่างน้อย 1 สถานี")
+    st.stop()
+if not prod_names:
+    st.warning("กรุณาเลือกอย่างน้อย 1 สินค้า")
+    st.stop()
