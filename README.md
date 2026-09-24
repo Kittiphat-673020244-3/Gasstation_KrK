@@ -1,349 +1,402 @@
-<h1 align="center">GasStationDB</h1>
+# GasStationDB
 
-<p align="center">
-  <strong>Data Warehouse & Business Intelligence Project</strong><br>
-  จากฐานข้อมูลธุรกรรม (OLTP) สู่คลังข้อมูลเพื่อการวิเคราะห์ (OLAP) และ Interactive Dashboard
-</p>
+### Data Warehouse & Business Intelligence for Gas Station Operations
 
-<p align="center">
-  <a href="https://github.com/Papawadee-Mohdee/Gasstation_KRK/tree/krk_gas"><img alt="GitHub Branch" src="https://img.shields.io/badge/Branch-krk__gas-24292F?style=for-the-badge&logo=github&logoColor=white"></a>
-  <a href="https://www.python.org/"><img alt="Python 3.12" src="https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white"></a>
-  <a href="https://duckdb.org/"><img alt="DuckDB 1.5.4" src="https://img.shields.io/badge/DuckDB-1.5.4-FFF000?style=for-the-badge&logo=duckdb&logoColor=black"></a>
-  <a href="https://www.getdbt.com/"><img alt="dbt Core" src="https://img.shields.io/badge/dbt_Core-1.11-FF694B?style=for-the-badge&logo=dbt&logoColor=white"></a>
-  <a href="https://streamlit.io/"><img alt="Streamlit" src="https://img.shields.io/badge/Streamlit-1.60-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white"></a>
-  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/License-MIT-2EA44F?style=for-the-badge"></a>
-</p>
+โครงงานออกแบบและพัฒนาคลังข้อมูลสำหรับธุรกิจสถานีบริการน้ำมัน โดยนำข้อมูลธุรกรรมจากระบบ **OLTP** มาจัดรูปแบบเป็นแบบจำลองเชิงมิติสำหรับการวิเคราะห์ **OLAP** เพื่อตอบคำถามทางธุรกิจ 15 ข้อ และนำเสนอผลผ่าน Interactive Dashboard
 
-<p align="center">
-  <a href="https://kdvxcyh5deojv4aewtnmwb.streamlit.app/"><strong>Live Demo</strong></a>
-  &nbsp;·&nbsp;
-  <a href="https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view"><strong>OLTP ER Diagram</strong></a>
-  &nbsp;·&nbsp;
-  <a href="https://drive.google.com/file/d/1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq/view?usp=sharing"><strong>Data Cube / Star Schema</strong></a>
-</p>
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![DuckDB](https://img.shields.io/badge/DuckDB-FFF000?style=flat-square&logo=duckdb&logoColor=black)
+![dbt Core](https://img.shields.io/badge/dbt_Core-FF694B?style=flat-square&logo=dbt&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-FF4B4B?style=flat-square&logo=streamlit&logoColor=white)
 
-> **Repository:** [Gasstation_KRK](https://github.com/Papawadee-Mohdee/Gasstation_KRK/tree/krk_gas)  
-> **Group:** Project Group 1  
-> **Course:** SC663402 — Data Warehouse and Big Data Analytics
+| รายการ | รายละเอียด |
+| :--- | :--- |
+| Repository | `Gasstation_KRK` |
+| กลุ่ม | Project Group 1 |
+| รายวิชา | SC663402 Data Warehouse and Big Data Analytics |
+| ชุดข้อมูล | GasStationDB — HCM City, PostgreSQL dataset จาก Kaggle |
+| ช่วงข้อมูล | 15 มีนาคม – 7 เมษายน 2024 รวม 24 วัน |
+| ผลลัพธ์ | คลังข้อมูลเชิงมิติ, Data Mart 15 ตาราง และแดชบอร์ด Streamlit |
 
 ---
 
-## Contents
+## สารบัญ
 
-1. [Project Overview](#project-overview)
-2. [Team Members](#team-members)
-3. [Dataset & OLTP](#dataset--oltp)
-4. [Data Architecture & ELT](#data-architecture--elt)
-5. [Star Schema & Data Cube](#star-schema--data-cube)
-6. [Project Structure](#project-structure)
-7. [15 Business Questions](#15-business-questions)
-8. [Interactive Dashboard](#interactive-dashboard)
-9. [Quick Start](#quick-start)
-10. [Technology Stack](#technology-stack)
-11. [Data Limitations & Next Steps](#data-limitations--next-steps)
-12. [License](#license)
+- [1. ภาพรวมโครงการ](#overview)
+- [2. สมาชิกในกลุ่ม](#team)
+- [3. ฐานข้อมูลต้นทาง — Operational Database](#source-database)
+- [4. แนวคิดและโครงสร้างคลังข้อมูล](#warehouse-design)
+- [5. Galaxy Schema](#galaxy-schema)
+- [6. กระบวนการ ELT](#elt-pipeline)
+- [7. รายละเอียดโมเดลข้อมูล](#data-models)
+- [8. คำถามทางธุรกิจและ Data Mart ทั้ง 15 ข้อ](#business-questions)
+- [9. การตรวจสอบคุณภาพและขอบเขตการวิเคราะห์](#data-quality)
+- [10. การติดตั้งและใช้งาน](#getting-started)
 
----
+<a id="overview"></a>
 
-## Project Overview
+## 1. ภาพรวมโครงการ
 
-โครงงานนี้ออกแบบและพัฒนา **คลังข้อมูลสำหรับธุรกิจสถานีบริการน้ำมัน** โดยนำข้อมูลจากระบบปฏิบัติการ (OLTP) เข้าสู่กระบวนการ **Extract, Load, Transform (ELT)** แล้วจัดทำแบบจำลองเชิงมิติสำหรับการวิเคราะห์ (OLAP) ก่อนนำเสนอข้อมูลผ่าน **Streamlit และ Plotly** เพื่อสนับสนุนการตัดสินใจด้านยอดขาย สินค้า การชำระเงิน คลังน้ำมัน และการดำเนินงานของแต่ละสาขา
+ข้อมูลการขายและคลังน้ำมันในระบบปฏิบัติการถูกจัดเก็บเพื่อรองรับธุรกรรมประจำวัน โครงการนี้นำข้อมูลดังกล่าวมาจัดโครงสร้างใหม่ เพื่อให้สามารถวิเคราะห์ยอดขาย ประสิทธิภาพสถานีบริการ ภาระงานของพนักงาน และความสอดคล้องระหว่างการขายกับการเคลื่อนไหวของน้ำมันได้อย่างเป็นระบบ
 
-**วัตถุประสงค์หลัก**
+วัตถุประสงค์ของโครงการมีดังนี้
 
-- ออกแบบกระบวนการเปลี่ยนข้อมูลธุรกรรมให้เป็นคลังข้อมูลแบบ Fact / Dimension
-- วิเคราะห์พฤติกรรมยอดขายและการดำเนินงานโดยจำแนกตามช่วงเวลา สถานี และสายถนน
-- ติดตามระดับน้ำมันคงเหลือและเปรียบเทียบรายการจ่ายออกกับยอดขาย
-- สื่อสารผลการวิเคราะห์ด้วย Interactive Dashboard และตัวกรองที่ผู้ใช้เลือกได้
+1. รวมข้อมูลจากระบบ OLTP เข้าสู่คลังข้อมูลบน DuckDB
+2. สร้างกระบวนการ ELT ด้วย dbt เพื่อจัดเตรียมและแปลงข้อมูลอย่างเป็นลำดับ
+3. ออกแบบ Dimension, Fact และตารางเชื่อมโยงให้รองรับการวิเคราะห์ข้ามกระบวนการธุรกิจ
+4. สร้าง Data Mart สำหรับคำถามทางธุรกิจ 15 ข้อ
+5. นำเสนอข้อมูลผ่าน Streamlit เพื่อสนับสนุนการบริหารสถานีบริการน้ำมัน
 
-## Team Members
+| องค์ประกอบ | จำนวน | บทบาท |
+| :--- | :---: | :--- |
+| Source Tables | 8 | ข้อมูลธุรกรรมและข้อมูลหลักจากระบบต้นทาง |
+| Reference Seeds | 5 | ข้อมูลอ้างอิงและกติกาที่ทีมจัดเตรียมเพิ่มเติม |
+| Staging Models | 9 | เตรียมข้อมูลจาก 8 source tables และ seed สำหรับการจับคู่ถังกับสินค้า |
+| Dimension Tables | 9 | อธิบายบริบทของธุรกรรมและใช้กรองหรือจัดกลุ่มข้อมูล |
+| Bridge Table | 1 | จับคู่ถังเก็บน้ำมันกับสินค้าโดยมีช่วงเวลาที่มีผล |
+| Fact Tables | 3 | เก็บข้อมูลระดับใบเสร็จ รายการขาย และธุรกรรมคลังน้ำมัน |
+| Intermediate Tables | 2 | รวมข้อมูลรายวันเพื่อใช้ซ้ำในชั้นวิเคราะห์ |
+| Data Marts | 15 | เตรียมผลวิเคราะห์สำหรับแต่ละคำถามทางธุรกิจ |
 
-| รหัสนักศึกษา | ชื่อ–นามสกุล | บทบาท |
-|:---:|:---|:---|
-| **673020045-9** | นายประภากร มีใส | Project Lead & Data Architect |
-| **673020244-3** | นายกิตติพัศ ลาล้ำ | Data Engineer |
-| **673020256-6** | นางสาวปภาวดี เหมาะดี | Data Analyst Lead |
-| **673020264-7** | นางสาวสุกัญญา อุดมกัน | Data Modeler |
-| **673020266-3** | นางสาวสุพิชญา ผ่องสนาม | Data Quality Engineer |
-| **673020270-2** | นางสาวอาทิติญา ชาชัย | Business Intelligence Analyst |
+<a id="team"></a>
 
-## Dataset & OLTP
+## 2. สมาชิกในกลุ่ม
 
-ข้อมูลตั้งต้นของโครงงานคือ **GasStationDB (HCM City – PostgreSQL)** ซึ่งกลุ่มระบุว่ามาจาก Kaggle โดยครอบคลุมข้อมูลธุรกรรมการขาย บุคลากร ลูกค้า สินค้า สถานี และการเคลื่อนไหวน้ำมัน **15 มีนาคม – 7 เมษายน 2024 (24 วัน ตามคำอธิบายชุดข้อมูลของกลุ่ม)**
+| รหัสนักศึกษา | ชื่อ–นามสกุล |
+| :---: | :--- |
+| 673020045-9 | นายประภากร มีใส |
+| 673020244-3 | นายกิตติพัศ ลาล้ำ |
+| 673020256-6 | นางสาวปภาวดี เหมาะดี |
+| 673020264-7 | นางสาวสุกัญญา อุดมกัน |
+| 673020266-3 | นางสาวสุพิชญา ผ่องสนาม |
+| 673020270-2 | นางสาวอาทิติญา ชาชัย |
 
-| กลุ่มข้อมูล | ตาราง OLTP | ใช้สำหรับ |
-|:---|:---|:---|
-| Master Data | `GasStation`, `Employee`, `Customer`, `Product` | ข้อมูลสถานี พนักงาน ลูกค้า และสินค้า |
-| Sales Transactions | `Invoice`, `InvoiceDetail` | หัวบิล รายการสินค้า ยอดขาย และวิธีชำระเงิน |
-| Inventory Transactions | `StorageTank`, `InventoryTransaction` | ความจุถัง ปริมาณรับเข้า จ่ายออก และคงเหลือ |
+<a id="source-database"></a>
 
-### Operational ER Diagram
+## 3. ฐานข้อมูลต้นทาง — Operational Database
 
-แบบจำลองฐานข้อมูลต้นทาง (OLTP) แสดงความสัมพันธ์ระหว่างข้อมูลสถานี พนักงาน ลูกค้า สินค้า ใบแจ้งหนี้ รายการขาย ถังเก็บ และธุรกรรมคลังน้ำมัน
+ชุดข้อมูล **GasStationDB** เป็นข้อมูลระบบสถานีบริการน้ำมันในนครโฮจิมินห์ ประเทศเวียดนาม จาก Kaggle โดยข้อมูลธุรกรรมที่ใช้ในโครงการครอบคลุม 24 วัน ตั้งแต่วันที่ 15 มีนาคม ถึง 7 เมษายน 2024
 
-<p align="center">
-  <a href="https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view" target="_blank">
-    <img src="https://drive.google.com/thumbnail?id=1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH&sz=w1600" alt="GasStationDB Operational ER Diagram" width="900">
-  </a>
-</p>
+<!-- เพิ่มลิงก์หน้าชุดข้อมูล Kaggle ที่ทีมใช้จริงในส่วนนี้ เมื่อมี URL พร้อมอ้างอิง -->
 
-<p align="center"><em>Operational ER Diagram — คลิกที่ภาพเพื่อเปิดไฟล์ต้นฉบับบน Google Drive</em></p>
-**[เปิดดู Operational ER Diagram บน Google Drive](https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view)**
+### 3.1 ขอบเขตข้อมูลต้นทาง
 
-> **หมายเหตุด้านแหล่งข้อมูล:** ก่อนส่งงานฉบับสุดท้าย ควรเพิ่มลิงก์หน้า Dataset บน Kaggle ที่ตรงกับชุดข้อมูลต้นฉบับ เพื่อให้ตรวจสอบที่มาและเงื่อนไขการใช้งานได้
+| กลุ่มข้อมูล | ตาราง | รายละเอียด |
+| :--- | :--- | :--- |
+| ข้อมูลหลัก | `gasstation` | ข้อมูลสถานีบริการและที่ตั้ง |
+| ข้อมูลหลัก | `employee` | ข้อมูลพนักงาน ตำแหน่งงาน และสถานีต้นสังกัด |
+| ข้อมูลหลัก | `customer` | ข้อมูลลูกค้า ประเภทยานพาหนะ และทะเบียนรถ |
+| ข้อมูลหลัก | `product` | ข้อมูลสินค้าและชนิดน้ำมัน |
+| ธุรกรรมการขาย | `invoice` | หัวใบเสร็จ วันเวลา ผู้ให้บริการ และวิธีชำระเงิน |
+| ธุรกรรมการขาย | `invoicedetail` | รายการสินค้า ปริมาณ และมูลค่าขายในแต่ละใบเสร็จ |
+| คลังน้ำมัน | `storagetank` | ข้อมูลถัง ความจุ และปริมาณน้ำมันคงเหลือ |
+| คลังน้ำมัน | `inventorytransaction` | ประวัติรับเข้า จ่ายออก และปริมาณคงเหลือของน้ำมัน |
 
-## Data Architecture & ELT
+ข้อมูลการขายมีโครงสร้างแบบ **Master–Detail** โดย `invoice` เก็บข้อมูลระดับใบเสร็จ และ `invoicedetail` เก็บรายการสินค้าที่เชื่อมใบเสร็จกับสินค้าแต่ละรายการ
 
-```mermaid
-flowchart LR
-    A["OLTP / CSV<br/>8 source tables"] --> B["Extract & Load<br/>DuckDB raw tables"]
-    B --> C["dbt Staging<br/>stg_* models"]
-    C --> D["Data Warehouse<br/>Facts & Dimensions"]
-    D --> E["Streamlit + Plotly<br/>5 analytics views"]
-```
+### 3.2 ER Diagram ของระบบต้นทาง
 
-| ขั้นตอน | เครื่องมือ | รายละเอียด |
-|:---:|:---|:---|
-| **1. Extract / Load** | Python, DuckDB | อ่าน CSV ต้นทาง 8 ตารางและโหลดเป็น Raw Tables |
-| **2. Staging** | dbt Core, dbt-duckdb | เตรียมข้อมูลและจัดรูปแบบฟิลด์ก่อนนำไปสร้างโมเดลวิเคราะห์ |
-| **3. Transformation** | dbt, DuckDB | สร้าง Fact และ Dimension พร้อมความสัมพันธ์ตามโมเดลคลังข้อมูล |
-| **4. Data Validation** | dbt data tests | กำหนดการทดสอบ `not_null`, `unique` และ `relationships` ใน `schema.yml` |
-| **5. Visualization** | Streamlit, Plotly | แสดงกราฟ KPI ตาราง และตัวกรองสำหรับผู้ใช้ |
+[เปิด ER Diagram บน Google Drive](https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view)
 
-เมื่อเปิดแอปครั้งแรก หากยังไม่มีฐานข้อมูลที่สมบูรณ์ `warehouse_setup.py` จะโหลด CSV และเรียก dbt เพื่อสร้าง `Gasstation_dw_duckdb/dev.duckdb` อัตโนมัติ โดยไม่เขียนทับฐานข้อมูลเดิมที่ไม่สมบูรณ์
+![ER Diagram ของฐานข้อมูลต้นทาง GasStationDB](./ER_gas.drawio.png)
 
-## Star Schema & Data Cube
+<a id="warehouse-design"></a>
 
-**แบบจำลองคลังข้อมูลจริงในสาขา `krk_gas`:**
+## 4. แนวคิดและโครงสร้างคลังข้อมูล
 
-| ประเภท | โมเดล | Grain / คำอธิบาย |
-|:---|:---|:---|
-| Fact | `fact_invoices` | หนึ่งแถวต่อใบแจ้งหนี้ (`InvoiceID`) — ยอดรวมและจำนวนบิล |
-| Fact | `fact_sales` | หนึ่งแถวต่อรายการขาย (`InvoiceDetailID`) — ปริมาณและมูลค่าขาย |
-| Fact | `fact_inventory` | หนึ่งแถวต่อธุรกรรมคลัง (`TransactionID`) — น้ำมันเข้า ออก และคงเหลือ |
-| Dimension | `dim_date`, `dim_hour` | วิเคราะห์ตามวันและชั่วโมง |
-| Dimension | `dim_gasstation` | มิติสถานีและข้อมูลพื้นที่/สายถนน |
-| Dimension | `dim_customer`, `dim_employee` | ข้อมูลลูกค้าและพนักงาน |
-| Dimension | `dim_products`, `dim_tanks` | ข้อมูลสินค้าและถังเก็บ |
+### 4.1 Dimension และ Fact
 
-### Data Model Diagram / Data Cube
+**Dimension Table** เก็บข้อมูลที่ใช้อธิบายบริบทของเหตุการณ์ เช่น ลูกค้า สินค้า สถานีบริการ วันที่ และชั่วโมง ใช้เป็นเงื่อนไขกรองข้อมูลหรือจัดกลุ่มผลวิเคราะห์ผ่าน `WHERE` และ `GROUP BY`
 
-แผนภาพนี้แสดงโครงสร้างคลังข้อมูลสำหรับการวิเคราะห์ โดยเชื่อม Fact Tables เข้ากับ Dimension Tables เพื่อรองรับการวิเคราะห์ยอดขาย สินค้า ลูกค้า พนักงาน เวลา สถานี และคลังน้ำมัน
+**Fact Table** เก็บเหตุการณ์ทางธุรกิจและค่าที่นำมาวัดผล เช่น มูลค่าขาย ปริมาณขาย และปริมาณน้ำมันจ่ายออก โดยแต่ละตารางต้องกำหนด **Grain** หรือระดับความละเอียดของหนึ่งแถวให้ชัดเจน และมีคีย์สำหรับเชื่อมกับ Dimension ที่เกี่ยวข้อง
 
-<p align="center">
-  <a href="https://drive.google.com/file/d/1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq/view?usp=sharing" target="_blank">
-    <img src="https://drive.google.com/thumbnail?id=1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq&sz=w1600" alt="GasStationDB Data Model Diagram" width="900">
-  </a>
-</p>
+ตัวอย่างการวิเคราะห์ยอดขายรายสถานี คือการเชื่อม `fact_invoice` กับ `dim_gasstation` ผ่าน `gasstation_id` แล้วรวม `total_amount` ตามสถานีบริการ
 
-<p align="center"><em>Data Model / Data Cube Diagram — คลิกที่ภาพเพื่อเปิดไฟล์ต้นฉบับบน Google Drive</em></p>
-**[เปิดดู Data Model / Data Cube Diagram บน Google Drive](https://drive.google.com/file/d/1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq/view?usp=sharing)**
+### 4.2 ระดับความละเอียดของ Fact Tables
 
-> **ข้อควรระวังในการสรุปข้อมูล:** ห้ามรวม `total_amount` จากหัวบิลซ้ำตามจำนวนรายการสินค้า และไม่ควรนำ `remaining_quantity` ของถังเดียวกันมาบวกข้ามเวลา ให้ใช้ยอดคงเหลือจากธุรกรรมล่าสุดตามวันที่เลือก
+| Fact Table | Grain — หนึ่งแถวแทน | Measures หลัก |
+| :--- | :--- | :--- |
+| `fact_invoice` | 1 ใบเสร็จ | `total_amount` |
+| `fact_sales` | 1 รายการสินค้าในใบเสร็จ | `quantity_sold`, `unit_price`, `total_price` |
+| `fact_inventory_transaction` | 1 ธุรกรรมคลังน้ำมัน | `quantity_in`, `quantity_out`, `remaining_quantity` |
 
-## Project Structure
+การวิเคราะห์จำนวนบิลและยอดขายระดับใบเสร็จใช้ `fact_invoice` ส่วนการวิเคราะห์ตามสินค้าใช้ `fact_sales` เพื่อรักษาระดับความละเอียดให้ตรงกับคำถาม และป้องกันการนับยอดขายระดับใบเสร็จซ้ำเมื่อเชื่อมกับรายการสินค้า
 
-โครงสร้างต่อไปนี้อ้างอิงไฟล์ที่มีอยู่ในสาขา `krk_gas` (ไม่รวมไฟล์ที่สร้างขึ้นเองระหว่างติดตั้ง เช่น `.venv/` และ `dev.duckdb`)
+### 4.3 Dimension ที่แต่ละ Fact ใช้งาน
+
+| Fact Table | Dimension ที่เกี่ยวข้อง |
+| :--- | :--- |
+| `fact_invoice` | `dim_gasstation`, `dim_customer`, `dim_employee`, `dim_payment_method`, `dim_date`, `dim_hour` |
+| `fact_sales` | `dim_gasstation`, `dim_customer`, `dim_employee`, `dim_product`, `dim_payment_method`, `dim_date`, `dim_hour` |
+| `fact_inventory_transaction` | `dim_gasstation`, `dim_tank`, `dim_product`, `dim_date`, `dim_hour` โดยระบุสินค้าอาศัย `bridge_tank_product` |
+
+**Conformed Dimensions** คือมิติที่ใช้ความหมายและคีย์สอดคล้องกันระหว่าง Fact หลายตาราง ทำให้เปรียบเทียบข้อมูลข้ามกระบวนการได้
+
+- `dim_gasstation`, `dim_date` และ `dim_hour` ใช้ร่วมกันใน Fact ทั้ง 3 ตาราง
+- `dim_product` ใช้ร่วมกันระหว่างข้อมูลรายการขายและธุรกรรมคลังน้ำมัน
+- `dim_customer`, `dim_employee` และ `dim_payment_method` ใช้ร่วมกันระหว่างข้อมูลใบเสร็จและรายการขาย
+- `dim_tank` ใช้กับธุรกรรมคลังน้ำมัน ส่วน `dim_vehicle_category` เป็นมิติอ้างอิงสำหรับจัดหมวดหมู่ยานพาหนะของลูกค้า
+
+### 4.4 มุมมองการวิเคราะห์แบบหลายมิติ
+
+ข้อมูลสามารถวิเคราะห์ผ่านแกนสถานีบริการ เวลา สินค้า ลูกค้า และพนักงานตามความสัมพันธ์ของแต่ละ Fact เช่น ยอดขายตามสถานีและวัน หรือปริมาณน้ำมันจ่ายออกตามสถานี สินค้า และวัน
+
+การออกแบบนี้เป็น **Galaxy Schema (Fact Constellation)** เนื่องจากมี Fact หลายตารางที่ใช้ Dimension บางส่วนร่วมกัน ส่วน Data Cube เป็นมุมมองการวิเคราะห์แบบหลายมิติที่สร้างจากข้อมูลเหล่านี้
+
+<a id="galaxy-schema"></a>
+
+## 5. Galaxy Schema
+
+แผนภาพในส่วนนี้ใช้แสดงความสัมพันธ์ของ Fact Tables, Dimension Tables และ `bridge_tank_product` ตามแบบจำลองของโครงการ
+
+> **สถานะแผนภาพ:** รอเพิ่มรูป Galaxy Schema จากสมาชิกในกลุ่ม
+
+<!-- GALAXY_SCHEMA_PLACEHOLDER
+เมื่อได้รับรูปจากสมาชิกในกลุ่ม:
+1. วางไฟล์ชื่อ Galaxy_Schema.png ในโฟลเดอร์เดียวกับ README.md
+2. ลบข้อความสถานะแผนภาพด้านบน
+3. นำบรรทัด Markdown ด้านล่างออกจาก comment นี้เพื่อแสดงรูป
+
+![Galaxy Schema ของคลังข้อมูล GasStationDB](./Galaxy_Schema.png)
+
+หากชื่อไฟล์หรือตำแหน่งต่างจากนี้ ให้แก้เส้นทางในวงเล็บให้ตรงกับไฟล์จริง
+GALAXY_SCHEMA_PLACEHOLDER -->
+
+<a id="elt-pipeline"></a>
+
+## 6. กระบวนการ ELT
+
+โครงการใช้แนวทาง **Extract–Load–Transform (ELT)** โดยโหลดข้อมูลดิบเข้า DuckDB ก่อน จากนั้นจึงแปลงข้อมูลด้วย SQL ผ่าน dbt และนำผลลัพธ์ไปใช้ใน Streamlit
 
 ```text
-Gasstation_KRK/
-├── .devcontainer/
-│   └── devcontainer.json                # GitHub Codespaces / Python 3.12
-├── .streamlit/
-│   └── config.toml                      # การตั้งค่า Streamlit
-├── .vscode/
-│   └── settings.json                    # การตั้งค่า VS Code
-├── Gasstation_dw_duckdb/
-│   ├── Datasets/                        # CSV ต้นทาง 8 ไฟล์
-│   │   ├── Customer.csv
-│   │   ├── Employee.csv
-│   │   ├── GasStation.csv
-│   │   ├── InventoryTransaction.csv
-│   │   ├── Invoice.csv
-│   │   ├── InvoiceDetail.csv
-│   │   ├── Product.csv
-│   │   └── StorageTank.csv
-│   ├── models/
-│   │   ├── staging/
-│   │   │   ├── src_gas.yml
-│   │   │   ├── stg_customer.sql
-│   │   │   ├── stg_employee.sql
-│   │   │   ├── stg_gasstation.sql
-│   │   │   ├── stg_inventorytransaction.sql
-│   │   │   ├── stg_invoice.sql
-│   │   │   ├── stg_invoicedetail.sql
-│   │   │   ├── stg_product.sql
-│   │   │   └── stg_storagetank.sql
-│   │   └── datawarehouse/
-│   │       ├── schema.yml
-│   │       ├── dim_customer.sql
-│   │       ├── dim_date.sql
-│   │       ├── dim_employee.sql
-│   │       ├── dim_gasstation.sql
-│   │       ├── dim_hour.sql
-│   │       ├── dim_products.sql
-│   │       ├── dim_tanks.sql
-│   │       ├── fact_invoices.sql
-│   │       ├── fact_inventory.sql
-│   │       └── fact_sales.sql
-│   ├── dbt_project.yml
-│   └── profiles.yml
-├── scripts/
-│   └── setup.sh                         # ติดตั้ง/ซ่อม .venv
-├── app.py                               # Streamlit Dashboard รวม 5 หมวด
-├── warehouse_setup.py                   # โหลด CSV และสร้างคลังข้อมูลอัตโนมัติ
-├── requirements.txt                     # Python dependencies
-├── .gitignore
-├── LICENSE
-└── README.md
+Raw CSV (8 ไฟล์) ──> DuckDB Source ──> Staging
+                                         │
+Reference Seeds (5 ไฟล์) ──────────────────┤
+                                         v
+                            Dimensions / Bridge / Facts
+                                         │
+                                         v
+                              Intermediate Aggregates
+                                         │
+                                         v
+                                  Data Marts (15)
+                                         │
+                                         v
+                                Streamlit Dashboard
 ```
 
-## 15 Business Questions
+ลำดับข้างต้นเป็นภาพรวมการไหลของข้อมูล โดยบาง Mart อ่านจาก Fact หรือ Dimension โดยตรง และ dbt จัดลำดับการสร้างโมเดลตาม dependency ที่ประกาศด้วย `ref()`
 
-โจทย์วิเคราะห์ทางธุรกิจทั้ง 15 ข้อตามขอบเขตโครงงาน แบ่งเป็น 5 กลุ่ม โดย **โจทย์ที่ระบุด้านล่างเป็นขอบเขตการวิเคราะห์ ไม่ได้หมายความว่าทุกข้อมีกราฟสำเร็จรูปในแอปปัจจุบัน**
+### 6.1 Extract — สกัดข้อมูล
 
-### 1) Sales & Revenue — ยอดขายและรายได้
+ข้อมูลต้นทางประกอบด้วย CSV 8 ไฟล์ ได้แก่ `Customer.csv`, `Employee.csv`, `GasStation.csv`, `Invoice.csv`, `InvoiceDetail.csv`, `Product.csv`, `StorageTank.csv` และ `InventoryTransaction.csv`
 
-| # | คำถามทางธุรกิจ |
-|:---:|:---|
-| **Q1** | รายได้รวมแยกตามสาขาในแต่ละเดือนเป็นเท่าใด? |
-| **Q2** | สินค้า/น้ำมันชนิดใดขายดีที่สุด ทั้งด้านปริมาณ (`quantity_sold`) และมูลค่า (`sales_amount`)? |
-| **Q3** | ลูกค้านิยมใช้ช่องทางชำระเงินใด และแต่ละช่องทางมีสัดส่วนเท่าใด? |
-| **Q4** | มูลค่าซื้อเฉลี่ยต่อบิล (Average Transaction Value) เท่าใด และเปลี่ยนแปลงตามเวลาอย่างไร? |
+ทีมจัดเตรียมตารางอ้างอิงเพิ่มเติม 5 ตาราง ดังนี้
 
-### 2) Customer Analytics — ด้านลูกค้า
+| Seed | หน้าที่ |
+| :--- | :--- |
+| `ref_vehicle_category` | จัดหมวดหมู่ยานพาหนะของลูกค้า |
+| `ref_product_policy` | ระบุสินค้าเชื้อเพลิงและหน่วยวัด |
+| `ref_hour_bucket` | กำหนดชื่อช่วงเวลาภายในวัน |
+| `ref_data_coverage` | ระบุความครบถ้วนของข้อมูลแต่ละวัน |
+| `ref_tank_product_map` | เก็บการจับคู่ถังกับสินค้าที่ตรวจทาน พร้อมช่วงเวลาที่มีผล |
 
-| # | คำถามทางธุรกิจ |
-|:---:|:---|
-| **Q5** | ลูกค้ารายใดซื้อบ่อยที่สุด และรายใดมีมูลค่าซื้อสะสมสูงสุด? |
-| **Q6** | ประเภทยานพาหนะใดใช้บริการบ่อยที่สุด? |
-| **Q7** | ลูกค้ากี่รายไม่กลับมาซื้อซ้ำในรอบ 3–6 เดือน (Customer Churn)? **ต้องเพิ่มข้อมูลย้อนหลัง** |
+### 6.2 Load — โหลดข้อมูล
 
-### 3) Employee Analytics — ด้านพนักงาน
+`load_raw.py` โหลด CSV ทั้ง 8 ไฟล์เข้า DuckDB ใน schema `main` โดยเก็บคอลัมน์ต้นทางเป็น `VARCHAR` ก่อน และประกาศแหล่งข้อมูลให้ dbt อ้างอิงผ่าน `source()` ใน `src_gas.yml`
 
-| # | คำถามทางธุรกิจ |
-|:---:|:---|
-| **Q8** | พนักงานคนใดสร้างยอดขายได้สูงสุดในแต่ละเดือน? |
-| **Q9** | จำนวนและตำแหน่งของพนักงานแต่ละสาขาสอดคล้องกับปริมาณธุรกรรมหรือไม่? |
+ส่วนตารางอ้างอิงทั้ง 5 ตารางโหลดด้วย `dbt seed` โดยชนิดข้อมูลขึ้นอยู่กับการอนุมานและการตั้งค่าของ seed จึงต้องตรวจสอบให้ตรงกับการใช้งานในโมเดลถัดไป
 
-### 4) Inventory Analytics — ด้านสต๊อกและถังเก็บ
+### 6.3 Transform — แปลงข้อมูล
 
-| # | คำถามทางธุรกิจ |
-|:---:|:---|
-| **Q10** | ระดับน้ำมันคงเหลือของแต่ละถังใกล้ถึงเกณฑ์ที่ต้องสั่งเติมหรือยัง? |
-| **Q11** | ปริมาณสินค้าคงเหลือเทียบกับยอดขายของแต่ละชนิดเป็นอย่างไร? |
-| **Q12** | น้ำมันรับเข้า–จ่ายออกแต่ละถังสอดคล้องกับปริมาณขายหรือไม่ และรายการใดควรตรวจสอบเพิ่มเติม? |
-| **Q13** | ซัพพลายเออร์รายใดจัดหาสินค้าบ่อยที่สุด และส่วนต่างระหว่างราคาขายกับต้นทุนเป็นเท่าใด? **ต้องยืนยันข้อมูลต้นทุนและการจัดส่ง** |
+| Layer | ตำแหน่งโมเดล | หน้าที่ |
+| :--- | :--- | :--- |
+| Staging | `models/staging/` | อ่าน source หรือ seed แปลงชนิดข้อมูลที่จำเป็น และเพิ่มเวลาโหลดข้อมูล |
+| Dimension / Bridge / Fact | `models/datawarehouse/` | จัดรูปแบบคีย์ เชื่อมข้อมูล และสร้างแบบจำลองเชิงมิติ |
+| Intermediate | `models/datawarehouse/` | รวมข้อมูลตามระดับที่ใช้ร่วมกันในการวิเคราะห์ |
+| Mart | `models/datawarehouse/` | เตรียมตัวชี้วัดสำหรับคำถามทางธุรกิจและแดชบอร์ด |
 
-### 5) Station Analytics — ด้านสาขา
+<a id="data-models"></a>
 
-| # | คำถามทางธุรกิจ |
-|:---:|:---|
-| **Q14** | สาขาใดมีรายได้สูงสุด/ต่ำสุดเมื่อเปรียบเทียบตามช่วงเวลา? |
-| **Q15** | ความจุถังเก็บของแต่ละสาขารองรับยอดขายเฉลี่ยต่อวันได้เพียงพอหรือไม่? |
+## 7. รายละเอียดโมเดลข้อมูล
 
-## Interactive Dashboard
+### 7.1 Staging Layer
 
-**Live Demo:** [GasStation Enterprise DW & Analytics Studio](https://kdvxcyh5deojv4aewtnmwb.streamlit.app/)
+Staging เป็นชั้นเตรียมข้อมูลก่อนเข้าสู่คลังข้อมูล โดยเพิ่ม `ingestion_timestamp` และแปลงชนิดข้อมูลเฉพาะคอลัมน์ที่จำเป็นต่อการคำนวณหรือเชื่อมตาราง
 
-สาขา `krk_gas` ปัจจุบันเปิดผ่าน **`app.py` ไฟล์เดียว** และมีเมนูวิเคราะห์จริง 5 หมวด ดังนี้
+| Model | แหล่งข้อมูล | การจัดเตรียมข้อมูล |
+| :--- | :--- | :--- |
+| `stg_Customer` | `customer` | อ่านข้อมูลลูกค้าและเพิ่ม `ingestion_timestamp` |
+| `stg_Employee` | `employee` | อ่านข้อมูลพนักงานและเพิ่ม `ingestion_timestamp` |
+| `stg_GasStation` | `gasstation` | อ่านข้อมูลสถานีบริการและเพิ่ม `ingestion_timestamp` |
+| `stg_Product` | `product` | อ่านข้อมูลสินค้าและเพิ่ม `ingestion_timestamp` |
+| `stg_Invoice` | `invoice` | แปลง `TotalAmount` เป็น `DOUBLE` |
+| `stg_InvoiceDetail` | `invoicedetail` | แปลง `QuantitySold`, `SellingPrice`, `TotalPrice` เป็น `DOUBLE` |
+| `stg_StorageTank` | `storagetank` | แปลง `TankID` เป็น `BIGINT` และ `Capacity`, `CurrentQuantity` เป็น `DOUBLE` |
+| `stg_InventoryTransaction` | `inventorytransaction` | แปลง `TankID` เป็น `BIGINT` และ `QuantityIn`, `QuantityOut`, `RemainingQuantity` เป็น `DOUBLE` |
+| `stg_TankProductMap` | `ref_tank_product_map` | ใช้ `TRY_CAST` แปลง `valid_from`, `valid_to`, `reviewed_at` เป็น `TIMESTAMP` |
 
-| เมนูในแอป | ตัวอย่างการวิเคราะห์ |
-|:---|:---|
-| **ยอดขายและพื้นที่** | ยอดขายรายวัน รายได้ตามสายถนน สถานีที่มียอดขายสูง และการเปรียบเทียบระหว่างสถานี |
-| **สินค้าและการชำระเงิน** | สินค้าขายดี สัดส่วนเบนซิน/ดีเซล วิธีชำระเงินและค่าธรรมเนียมบัตรเครดิตจำลอง |
-| **ช่วงเวลาและการให้บริการ** | ชั่วโมงที่มีการออกบิลสูงสุด และเปรียบเทียบวันธรรมดากับวันหยุดสุดสัปดาห์ |
-| **น้ำมันคงเหลือ** | ระดับน้ำมันล่าสุดในถัง และเปรียบเทียบรายการจ่ายออกกับปริมาณขาย |
-| **พนักงานและประสิทธิภาพ** | โครงสร้างตำแหน่งงาน พนักงานที่ออกบิลมาก และยอดขายต่อจำนวนพนักงาน |
+### 7.2 Dimension Tables
 
-ตัวกรองของแอปประกอบด้วย **ช่วงวันที่ · สายถนน · สถานี** เพื่อให้เปรียบเทียบพื้นที่และเจาะลึกรายสาขาได้ โดยกลุ่มพื้นที่ใช้ **สายถนนจากข้อมูลจริง** ไม่ใช่ Business Region ที่กำหนดขึ้นเอง
+โมเดลมิติหลักจัดรูปแบบชื่อคอลัมน์เป็น `snake_case` และคัดคีย์ซ้ำด้วย `ROW_NUMBER()` ก่อนเลือกแถวที่ `row_num = 1` ส่วนมิติที่สร้างจากชุดค่าหรือช่วงเวลาจะใช้วิธีสร้างข้อมูลตามหน้าที่ของแต่ละตาราง ทุกมิติเพิ่ม `ingestion_timestamp` เพื่อระบุเวลาโหลดข้อมูล
 
-<details>
-<summary><strong>ดูภาพเพิ่มเติม: GAS STATION INSIGHT</strong></summary>
+| Dimension | รายละเอียด |
+| :--- | :--- |
+| `dim_customer` | อ่าน `stg_Customer` และเชื่อม `ref_vehicle_category` ด้วยชื่อประเภทรถที่ปรับเป็นตัวพิมพ์เล็ก คัดข้อมูลซ้ำตาม `customer_id` |
+| `dim_employee` | อ่าน `stg_Employee` แปลง `StartDate` เป็นวันที่ เก็บ `home_gasstation_id` และคัดข้อมูลซ้ำตาม `employee_id` |
+| `dim_gasstation` | อ่าน `stg_GasStation` จัดรูปแบบข้อมูลสถานีและคัดข้อมูลซ้ำตาม `gasstation_id` |
+| `dim_product` | อ่าน `stg_Product` และเชื่อม `ref_product_policy` เพื่อเพิ่ม `is_fuel` และ `unit_of_measure` คัดข้อมูลซ้ำตาม `product_id` |
+| `dim_tank` | อ่าน `stg_StorageTank` เก็บ `tank_id`, `gasstation_id`, `capacity_liters`, `current_quantity` และคัดข้อมูลซ้ำตาม `tank_id` |
+| `dim_payment_method` | สร้างจากวิธีชำระเงินที่ไม่ซ้ำใน `stg_Invoice` ใช้ค่าตัวพิมพ์เล็กเป็น `payment_method_key` และเก็บข้อความต้นทางเป็น `payment_method_label` |
+| `dim_vehicle_category` | อ่าน `ref_vehicle_category` เพื่อเก็บ `vehicle_type_key`, `vehicle_type_label`, `vehicle_category` |
+| `dim_date` | ใช้ `generate_series()` สร้างวันที่ตั้งแต่วันต่ำสุดถึงสูงสุดในใบเสร็จและธุรกรรมคลังน้ำมัน เพิ่ม `date_key` รูปแบบ `YYYYMMDD`, `date_day`, `year`, `month`, `day_of_month`, `iso_weekday`, `weekday_name`, `is_weekend` และ `is_complete_day` จาก `ref_data_coverage` |
+| `dim_hour` | สร้างชั่วโมง 0–23 และเชื่อม `ref_hour_bucket` เพื่อระบุ `day_part` หากไม่พบข้อมูลอ้างอิง ใช้ชื่อช่วงเวลาเริ่มต้นของโมเดล |
 
-<p align="center">
-  <img src="https://github.com/user-attachments/assets/8b14c466-d902-4294-8662-eb96ee3129bd" alt="Gas Station Insight dashboard overview" width="700">
-</p>
-</details>
+`dim_tank` เก็บสถานะปัจจุบันของถัง โดยไม่ได้เก็บประวัติการเปลี่ยนแปลงแบบ Slowly Changing Dimension Type 2 (SCD Type 2)
 
-## Quick Start
+### 7.3 Bridge Table
 
-### Prerequisites
+`bridge_tank_product` ใช้ระบุชนิดสินค้าที่เกี่ยวข้องกับถังน้ำมัน เนื่องจากข้อมูลดิบไม่มีความสัมพันธ์ระหว่างถังกับสินค้าโดยตรง โดยให้ลำดับความสำคัญของการจับคู่ดังนี้
 
-- **Python 3.12** (เวอร์ชันที่กำหนดใน Codespaces และใช้ตรวจสอบ dependencies)
-- **Git** และ Terminal แบบ Linux/macOS หรือ **GitHub Codespaces**
-- อินเทอร์เน็ตสำหรับติดตั้งแพ็กเกจครั้งแรก
+1. **การจับคู่ที่ตรวจทานแล้ว:** อ่านจาก `stg_TankProductMap` เฉพาะแถวที่ `review_status = 'approved'` และใช้ช่วงเวลาที่มีผลของการจับคู่
+2. **การอนุมานจากชื่อถัง:** สำหรับถังที่ไม่มีการจับคู่ด้วยมือ ใช้ชื่อถังจาก `dim_tank.tank_name` โดยตัดคำว่า `Tank` ออก แล้วเทียบกับ `dim_product.product_name` กำหนดวันเริ่มต้นเป็น `1900-01-01`
 
-### Option A — GitHub Codespaces
+`fact_inventory_transaction` ใช้ `tank_id` และเวลาธุรกรรมที่อยู่ในช่วง `valid_from`–`valid_to` เพื่อระบุ `product_id` การตรวจสอบความครบถ้วนของการจับคู่และช่วงเวลาที่ซ้อนทับกันจึงมีผลต่อความถูกต้องของการวิเคราะห์คลังน้ำมัน
 
-Codespace ใหม่ในสาขานี้จะเรียก`bash scripts/setup.sh` อัตโนมัติผ่าน `postCreateCommand` เพื่อสร้าง `.venv` และติดตั้ง dependencies เมื่อเริ่มใช้งานครั้งแรก
+### 7.4 Fact Tables
 
-เปิด Terminal ที่โฟลเดอร์หลักของโปรเจกต์ แล้วใช้คำสั่ง:
+| Fact | แหล่งข้อมูลและการแปลง |
+| :--- | :--- |
+| `fact_invoice` | อ่าน `stg_Invoice` สร้าง `date_key` และ `hour_of_day` จาก `IssueDate` เก็บคีย์สถานี ลูกค้า พนักงาน และวิธีชำระเงิน พร้อม `total_amount` กรองแถวที่ `invoice_id` เป็นค่าว่าง |
+| `fact_sales` | เชื่อม `stg_InvoiceDetail` กับ `stg_Invoice` ด้วย `InvoiceID` เพื่อเพิ่มบริบทใบเสร็จและเวลา เก็บ `product_id`, `quantity_sold`, `unit_price`, `total_price` กรองแถวที่ `invoice_detail_id` เป็นค่าว่าง |
+| `fact_inventory_transaction` | เชื่อม `stg_InventoryTransaction` กับ `stg_StorageTank` ด้วย `TankID` เพื่อระบุสถานี แล้ว `LEFT JOIN` กับ `bridge_tank_product` เพื่อระบุสินค้า สร้างคีย์วันที่และชั่วโมงจาก `TransactionDate` เก็บ `quantity_in`, `quantity_out`, `remaining_quantity` และกรองแถวที่ `transaction_id` เป็นค่าว่าง |
 
-```bash
-source .venv/bin/activate
-streamlit run app.py
-```
+### 7.5 Intermediate Tables
 
-หากเป็น Codespace เดิม หรือ `.venv` ใช้งานไม่ได้ ให้สั่ง `bash scripts/setup.sh` ก่อน แล้วจึงเปิดแอป
+Intermediate เป็นตารางสรุปที่ใช้ซ้ำในหลาย Mart ช่วยให้การเปรียบเทียบยอดขายกับคลังน้ำมันอยู่ที่ระดับความละเอียดเดียวกัน และลดการรวมข้อมูลระดับธุรกรรมซ้ำหลายครั้ง
 
-### Option B — Install locally (Linux / macOS / WSL)
+| Model | Grain | การคำนวณ |
+| :--- | :--- | :--- |
+| `int_sales_daily` | สถานี × สินค้า × วัน | รวม `quantity_sold`, `total_price` และนับจำนวนรายการจาก `fact_sales` |
+| `int_inventory_daily` | สถานี × สินค้า × วัน | รวม `quantity_in`, `quantity_out` จาก `fact_inventory_transaction` โดยไม่รวมแถวที่ระบุ `product_id` ไม่ได้ |
 
-```bash
-# 1) Clone เฉพาะสาขาที่ใช้งาน
-git clone --branch krk_gas --single-branch \
-  https://github.com/Papawadee-Mohdee/Gasstation_KRK.git
-cd Gasstation_KRK
+<a id="business-questions"></a>
 
-# 2) สร้าง .venv และติดตั้งแพ็กเกจจาก requirements.txt
-bash scripts/setup.sh
+## 8. คำถามทางธุรกิจและ Data Mart ทั้ง 15 ข้อ
 
-# 3) เปิด virtual environment และรันเว็บแอป
-source .venv/bin/activate
-streamlit run app.py
-```
+Data Mart แต่ละตารางจัดเตรียมข้อมูลสำหรับคำถามทางธุรกิจหนึ่งข้อ เพื่อให้แดชบอร์ดนำไปแสดงผลและกรองข้อมูลต่อได้สะดวก
 
-เมื่อแอปเริ่มทำงาน ให้เปิด URL ที่ Streamlit แสดงใน Terminal (ปกติคือ `http://localhost:8501`) หรือเปิดพอร์ต **8501** ในแท็บ **Ports** ของ Codespaces และหยุดแอปด้วย `Ctrl+C`
+### 8.1 ยอดขายและพฤติกรรมการใช้บริการ
 
-> **การสร้างฐานข้อมูล:** หากยังไม่มี `Gasstation_dw_duckdb/dev.duckdb` แอปจะเรียกกระบวนการโหลด CSV และรัน dbt ให้อัตโนมัติระหว่างการเริ่มทำงานครั้งแรก ไม่ต้องรัน `load.py` เพราะไม่มีไฟล์ดังกล่าวในสาขาปัจจุบัน  
-> **หมายเหตุ Windows:** สำหรับ Windows แนะนำ GitHub Codespaces หรือ WSL เนื่องจากสคริปต์สร้างคลังข้อมูลใช้ `fcntl` ซึ่งรองรับระบบ Unix-like
+| ข้อ | คำถามทางธุรกิจ | Data Mart และแนวทางวิเคราะห์ |
+| :---: | :--- | :--- |
+| 1 | ยอดขายเฉลี่ยรายวันของแต่ละสถานีเป็นเท่าใด และเมื่อจัดกลุ่มตามระดับยอดขาย แต่ละกลุ่มมีสัดส่วนเท่าใด? | `mart_01_station_sales_tiering` — คำนวณยอดขายเฉลี่ยต่อวันจาก `fact_invoice` และใช้ `NTILE(3)` แบ่งสถานีเป็นกลุ่มสูง กลาง และต่ำ เพื่อนำไปสรุปสัดส่วนจำนวนสถานีแต่ละกลุ่ม |
+| 2 | น้ำมันประเภทใด เช่น RON95-III, E5 RON92-II หรือดีเซล มียอดจำหน่ายสูงที่สุดในแต่ละสถานี ทั้งด้านปริมาณลิตรและมูลค่า? | `mart_02_top_fuel_per_station` — รวมข้อมูลจาก `int_sales_daily` เฉพาะสินค้าเชื้อเพลิง แล้วจัดอันดับตามปริมาณและมูลค่าแยกกันภายในแต่ละสถานี |
+| 3 | ชั่วโมงใดหรือช่วงเวลาใดที่แต่ละสถานีมีจำนวนบิลหนาแน่นที่สุด? | `mart_03_peak_hours` — นับบิลจาก `fact_invoice` แยกสถานีและชั่วโมง เชื่อม `dim_hour` เพื่อแสดงช่วงเวลา แล้วจัดอันดับเพื่อสนับสนุนการวางกำลังคน |
+| 4 | สัดส่วนการชำระด้วยเงินสดและบัตรเครดิตแตกต่างกันอย่างไรระหว่างสถานี? | `mart_04_payment_mix` — รวมจำนวนบิลและยอดขายตามวิธีชำระเงิน พร้อมคำนวณสัดส่วนยอดขายแต่ละช่องทางต่อยอดขายรวมของสถานี |
+| 5 | ยอดขายและจำนวนบิลระหว่างวันธรรมดากับวันหยุดสุดสัปดาห์แตกต่างกันอย่างไร? | `mart_05_weekday_vs_weekend` — เชื่อม `fact_invoice` กับ `dim_date` เพื่อเปรียบเทียบจำนวนบิล ยอดขายรวม และยอดขายเฉลี่ยต่อบิล ระหว่างจันทร์–ศุกร์กับเสาร์–อาทิตย์ |
 
-**ทดสอบโมเดล dbt หลังสร้างฐานข้อมูลแล้ว (ทางเลือก):**
+### 8.2 ผลงานพนักงาน ทำเล และรูปแบบยอดขาย
+
+| ข้อ | คำถามทางธุรกิจ | Data Mart และแนวทางวิเคราะห์ |
+| :---: | :--- | :--- |
+| 6 | พนักงานคนใดในแต่ละสถานีมีจำนวนบิลสะสมสูงที่สุดตลอดช่วงข้อมูล 24 วัน? | `mart_06_top_employee_per_station` — นับบิลตามสถานีและพนักงานจาก `fact_invoice` เชื่อมชื่อจาก `dim_employee` และจัดอันดับภายในสถานี |
+| 7 | สถานีที่ตั้งอยู่บนถนนใดสร้างยอดขายสูงที่สุดและต่ำที่สุด? | `mart_07_sales_by_road` — รวมยอดขายต่อสถานีจาก `fact_invoice` เชื่อมที่อยู่จาก `dim_gasstation` เพื่อแยกชื่อถนน และจัดอันดับสถานี |
+| 8 | สัดส่วนยอดขายระหว่างกลุ่มเบนซินกับดีเซลของแต่ละสถานีเป็นเท่าใด? | `mart_08_gasoline_vs_diesel` — เชื่อม `int_sales_daily` กับ `dim_product` รวมมูลค่าและปริมาณของกลุ่ม Gasoline และ Diesel พร้อมคำนวณสัดส่วนต่อยอดขายเชื้อเพลิงรวม |
+| 9 | ในแต่ละวัน สถานีใดมียอดขายสูงสุดและต่ำสุด และยอดขายต่างกันกี่เท่า? | `mart_09_daily_station_ranking` — รวมยอดขายรายวันต่อสถานีจาก `int_sales_daily` หาค่าสูงสุดและต่ำสุด แล้วคำนวณอัตราส่วนระหว่างสองค่า |
+| 10 | วันใดในสัปดาห์ที่แต่ละสถานีมียอดขายเฉลี่ยสูงที่สุด? | `mart_10_best_weekday_per_station` — เชื่อม `fact_invoice` กับ `dim_date` หายอดขายเฉลี่ยตามสถานีและวันในสัปดาห์ แล้วจัดอันดับวันขายดี |
+
+### 8.3 คลังน้ำมัน โครงสร้างบุคลากร และต้นทุน
+
+| ข้อ | คำถามทางธุรกิจ | Data Mart และแนวทางวิเคราะห์ |
+| :---: | :--- | :--- |
+| 11 | ปริมาณน้ำมันจ่ายออกจากถังสอดคล้องกับปริมาณขายหรือไม่ และสถานีใดมีความคลาดเคลื่อนที่ควรตรวจสอบ? | `mart_11_dispense_vs_sales_variance` — `FULL OUTER JOIN` ระหว่าง `int_sales_daily` และ `int_inventory_daily` ด้วยสถานี สินค้า และวัน คำนวณส่วนต่างและตั้งธงเมื่อส่วนต่างตามเกณฑ์ของโมเดลเกิน 5% |
+| 12 | ถังใดมีน้ำมันคงเหลือต่ำกว่าเกณฑ์เตือนภัย 20% ของความจุ? | `mart_12_low_fuel_tanks` — ใช้ `current_quantity / capacity_liters` จาก `dim_tank` เพื่อตรวจถังที่มีสัดส่วนคงเหลือต่ำกว่า 20% |
+| 13 | แต่ละสถานีมีพนักงานตำแหน่งใดบ้าง และตำแหน่งใดมีสัดส่วนมากที่สุด? | `mart_13_staffing_structure` — นับพนักงานตามสถานีและตำแหน่งจาก `dim_employee` คำนวณสัดส่วน และระบุตำแหน่งที่มีจำนวนมากที่สุด |
+| 14 | หากค่าธรรมเนียมบัตรเครดิตเท่ากับ 2% ต้นทุนจำลองคิดเป็นสัดส่วนเท่าใดของยอดขายรวมแต่ละสถานี? | `mart_14_credit_card_fee_simulation` — รวมยอดขายและยอดชำระด้วยบัตรจาก `fact_invoice` คำนวณค่าธรรมเนียมจำลองจากยอดบัตร × 2% และนำไปเทียบกับยอดขายรวม |
+| 15 | สถานีใดมียอดขายต่อพนักงานสูงที่สุด และมีภาระงานต่อพนักงานเติมน้ำมันมากน้อยเพียงใด? | `mart_15_revenue_per_employee` — รวมยอดขายและจำนวนบิลจาก `fact_invoice` กับจำนวนพนักงานจาก `dim_employee` เพื่อคำนวณรายได้ต่อพนักงานและจำนวนบิลต่อ Pump Attendant |
+
+<a id="data-quality"></a>
+
+## 9. การตรวจสอบคุณภาพและขอบเขตการวิเคราะห์
+
+### 9.1 การตรวจสอบข้อมูล
+
+ใช้ `dbt test` ตรวจสอบคุณภาพตามที่ประกาศไว้ในไฟล์ `schema.yml` เช่น คีย์ไม่ซ้ำและค่าที่ต้องไม่เป็นค่าว่าง โดยควรตรวจผลการทดสอบก่อนนำข้อมูลไปแสดงบนแดชบอร์ด
+
+ประเด็นที่ควรตรวจทานเพิ่มเติมเมื่อตรวจรับผลวิเคราะห์ ได้แก่
+
+- ความครบถ้วนของการจับคู่ถังกับสินค้า และช่วงเวลาที่มีผลของแต่ละคู่
+- จำนวนธุรกรรมคลังน้ำมันที่ระบุ `product_id` ไม่ได้ เนื่องจากแถวเหล่านี้ไม่ถูกนำไปรวมใน `int_inventory_daily`
+- การใช้ `is_complete_day` ให้สอดคล้องกับนิยามยอดขายเฉลี่ย และการพิจารณาวันที่ไม่มีรายการขาย
+- การจัดการตัวหารเป็นศูนย์ในอัตราส่วนยอดขาย ระดับน้ำมันคงเหลือ และตัวชี้วัดต่อพนักงาน
+- การรวมข้อมูลให้อยู่ที่ Grain เดียวกันก่อนเปรียบเทียบหรือเชื่อม Fact หลายตาราง
+
+### 9.2 ขอบเขตการตีความผล
+
+| ประเด็น | ขอบเขตการตีความ |
+| :--- | :--- |
+| ช่วงข้อมูล 24 วัน | ใช้อธิบายพฤติกรรมในช่วงที่ศึกษา การสรุปแนวโน้มระยะยาวหรือฤดูกาลต้องมีข้อมูลเพิ่มเติม |
+| การแบ่ง Sales Tier | `NTILE(3)` แบ่งสถานีตามลำดับยอดขายให้จำนวนสถานีแต่ละกลุ่มใกล้เคียงกัน ไม่ใช่เกณฑ์มูลค่ายอดขายตายตัว |
+| วันธรรมดาและวันหยุดสุดสัปดาห์ | เป็นการเปรียบเทียบเชิงพรรณนา การยืนยันนัยสำคัญทางสถิติต้องมีการทดสอบเพิ่มเติม และควรคำนึงถึงจำนวนวันของแต่ละกลุ่ม |
+| ทำเลตามถนน | Mart ข้อ 7 จัดอันดับสถานีโดยระบุถนน หากต้องการยอดขายรวมทั้งถนน ต้องรวมสถานีที่อยู่บนถนนเดียวกันก่อน |
+| ส่วนต่างน้ำมันเกิน 5% | เป็นสัญญาณให้ตรวจสอบข้อมูล เวลา และกระบวนการทำงาน ยังไม่ใช่ข้อสรุปว่ามีการสูญหาย |
+| ระดับน้ำมันต่ำกว่า 20% | อ้างอิงสถานะปัจจุบันในชุดข้อมูลของ `dim_tank` ไม่ใช่ค่าจากระบบตรวจวัดแบบเรียลไทม์ |
+| ค่าธรรมเนียมบัตรเครดิต 2% | เป็นสมมติฐานสำหรับการจำลองต้นทุน |
+| ยอดขายและจำนวนบิลต่อพนักงาน | เป็นตัวชี้วัดเบื้องต้น การสรุปความเพียงพอของกำลังคนต้องพิจารณากะ ชั่วโมงทำงาน และเวลาบริการประกอบ |
+
+<a id="getting-started"></a>
+
+## 10. การติดตั้งและใช้งาน
+
+คำสั่งต่อไปนี้เริ่มจากโฟลเดอร์หลักของ repository ซึ่งมี `requirements.txt`, `app.py` และโฟลเดอร์ `Gasstation_dw_duckdb` โดยใช้สภาพแวดล้อม Python ที่ติดตั้ง dependencies ของโครงการแล้ว
+
+### 10.1 ใช้งานผ่าน GitHub Codespaces
+
+1. เปิด repository บน GitHub เลือก **Code → Codespaces → Create codespace on main**
+2. รอให้ขั้นตอนตั้งค่าจาก `.devcontainer/devcontainer.json` เสร็จสิ้น ซึ่งตามการตั้งค่าของโครงการจะติดตั้ง dependencies ใน `.venv`, เรียก `dbt deps` และโหลดข้อมูลดิบเข้า `dev.duckdb`
+3. เปิด Terminal และรันแต่ละคำสั่งตามลำดับ โดยตรวจให้คำสั่งก่อนหน้าสำเร็จก่อนดำเนินการต่อ
 
 ```bash
 cd Gasstation_dw_duckdb
-dbt test --profiles-dir .
+dbt seed
+dbt run
+dbt test
+cd ..
+streamlit run app.py
 ```
 
-**ใช้ฐานข้อมูล DuckDB ที่มีอยู่แล้ว (ทางเลือก):** ตั้งค่า `GASSTATION_DB` ให้ชี้ไปยังไฟล์ที่มี Fact/Dimension ครบ ก่อนรัน `streamlit run app.py`
+เมื่อ Streamlit เริ่มทำงาน ให้เปิดพอร์ต **8501** ที่ Codespaces forward ไว้เพื่อเข้าใช้งานแดชบอร์ด
 
-## Technology Stack
+### 10.2 ใช้งานบนเครื่องตนเอง
 
-| Component | Technology | Purpose |
-|:---|:---|:---|
-| **Language** | Python 3.12 | สคริปต์สำหรับสร้างคลังข้อมูลและ Web Application |
-| **Storage / OLAP** | DuckDB 1.5.4 | เก็บและประมวลผลข้อมูลคลังในไฟล์ฐานข้อมูล |
-| **ELT / Modeling** | dbt Core 1.11.12 + dbt-duckdb 1.10.1 | จัดการ Staging, Fact, Dimension และ Data Tests |
-| **Data Processing** | pandas 3.0.5 | จัดรูปและสรุปข้อมูลสำหรับแดชบอร์ด |
-| **Data Visualization** | Streamlit 1.60.0 + Plotly 7.1.0 | สร้างหน้าเว็บ ตัวกรอง KPI และกราฟแบบ Interactive |
-| **Data Modeling** | draw.io | ออกแบบ OLTP ER Diagram และ Data Cube / Star Schema |
-| **Development** | GitHub + Codespaces | จัดการเวอร์ชันและสภาพแวดล้อมสำหรับทำงานร่วมกัน |
+ติดตั้ง dependencies จากโฟลเดอร์หลักของ repository
 
-เวอร์ชัน Python packages ข้างต้นอ้างอิงจาก `requirements.txt` ในสาขา `krk_gas`
+```bash
+python -m pip install -r requirements.txt
+```
 
-## Data Limitations & Next Steps
+เข้าโฟลเดอร์ dbt ติดตั้ง package ที่โครงการใช้ และโหลดข้อมูลดิบ โดยรัน `load_raw.py` ในครั้งแรกหรือเมื่อต้องการปรับปรุงข้อมูลดิบ
 
-- **ช่วงเวลาข้อมูลสั้น:** ข้อมูล 24 วันไม่เพียงพอสำหรับการวิเคราะห์การเลิกซื้อซ้ำในรอบ **3–6 เดือน (Q7)** และการสรุปแนวโน้มระยะยาว
-- **ข้อมูลต้นทุนยังไม่ชัดเจน:** ตาราง `Product` มี `Supplier` และ `UnitPrice` แต่ไม่ควรใช้ `UnitPrice` เป็น *ต้นทุนจัดซื้อ* โดยไม่มีการยืนยันเพิ่มเติม จึงยังไม่ควรสรุป Profit Margin ตาม Q13
-- **ข้อมูลพนักงานเป็น Snapshot:** จำนวนพนักงานใน Master Data ไม่ใช่จำนวนคนเข้ากะจริง และยังไม่เพียงพอสำหรับวินิจฉัยความเหมาะสมของอัตรากำลัง
-- **ความคลาดเคลื่อนน้ำมัน:** ส่วนต่างระหว่างยอดจ่ายออกกับยอดขายควรใช้เป็นสัญญาณสำหรับตรวจสอบ ไม่ใช่ข้อพิสูจน์ว่าเกิดการรั่วไหลหรือสูญหาย
-- **หน่วยเงิน:** ก่อนเผยแพร่ผลวิเคราะห์ ควรตรวจสอบสกุลเงินของชุดข้อมูลต้นฉบับ และทำป้ายกำกับทุกกราฟให้สอดคล้องกัน
-- **ส่วนขยายที่เสนอ:** เพิ่ม **DW Table Inspector / SQL Console** และ **Ad-Hoc OLAP Explorer** หลังพัฒนาและทดสอบเสร็จ (ยังไม่ใช่เมนูที่มีใน `app.py` สาขานี้)
+```bash
+cd Gasstation_dw_duckdb
+dbt deps
+python load_raw.py
+```
 
-## License
+สร้างและตรวจสอบคลังข้อมูล โดยรันตามลำดับ และแก้ไขข้อผิดพลาดของแต่ละขั้นก่อนดำเนินการต่อ
 
-โปรเจกต์นี้เผยแพร่โค้ดภายใต้ [MIT License](LICENSE) ตามไฟล์ `LICENSE` ใน Repository โดยสิทธิในการใช้ชุดข้อมูลและรูปภาพต้นทางให้เป็นไปตามเงื่อนไขของเจ้าของข้อมูลแต่ละแหล่ง
+```bash
+dbt seed
+dbt run
+dbt test
+```
 
----
+กลับไปยังโฟลเดอร์หลักเพื่อเปิดแดชบอร์ด
 
-<p align="center"><strong>Project Group 1 · SC663402 · GasStationDB</strong></p>
+```bash
+cd ..
+streamlit run app.py
+```
+
+หาก dbt เชื่อมต่อฐานข้อมูลไม่ได้ ให้ตรวจสอบการตั้งค่า profile และเส้นทาง DuckDB ให้ตรงกับโครงการก่อนรันใหม่
