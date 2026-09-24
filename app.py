@@ -343,3 +343,50 @@ if guard(mix):
     fig.update_xaxes(title_text="ยอดขาย (₫)")
     fig.update_yaxes(title_text="")
     st.plotly_chart(style(fig, 460, True), width="stretch")
+
+# ===========================================================================
+# ส่วนที่ 3 — รูปแบบเวลาการขาย
+# ===========================================================================
+panel("รูปแบบเวลาการขาย: ชั่วโมง × วันในสัปดาห์",
+      "Heatmap แสดงความหนาแน่นของการออกบิลตามชั่วโมงและวันในสัปดาห์ ช่องสีเข้มคือช่วงเวลาที่มีบิลหนาแน่นที่สุด "
+      "เปรียบเทียบวันธรรมดากับวันหยุดสุดสัปดาห์ และดูวันที่ขายดีที่สุดในรอบสัปดาห์ได้จากภาพเดียว")
+
+heat = q("""
+    select d.weekday_name, f.hour_of_day, count(*) as bill_count
+    from fact_invoice f join dim_date d on f.date_key = d.date_key
+    where f.gasstation_id = any(?) and f.date_key between ? and ?
+    group by 1, 2
+""", (S, k0, k1))
+
+if guard(heat):
+    heat["wd"] = heat["weekday_name"].map(WEEKDAY_TH)
+    piv = (heat.pivot_table(index="wd", columns="hour_of_day", values="bill_count",
+                             aggfunc="sum", fill_value=0).reindex(WEEKDAY_ORDER).fillna(0))
+    fig = go.Figure(go.Heatmap(
+        z=piv.values, x=[f"{h:02d}" for h in piv.columns], y=piv.index,
+        colorscale=SEQ_BLUE, xgap=2, ygap=2,
+        colorbar=dict(title="บิล", outlinewidth=0, tickfont=dict(color=MUTED)),
+        hovertemplate="%{y} %{x}:00<br>%{z:,.0f} บิล<extra></extra>"))
+    fig.update_xaxes(title_text="ชั่วโมง")
+    fig.update_yaxes(autorange="reversed", title_text="")
+    st.plotly_chart(style(fig, 380, False), width="stretch")
+
+# ===========================================================================
+# ส่วนที่ 4 — ช่องทางการชำระเงิน
+# ===========================================================================
+panel("ช่องทางการชำระเงินและต้นทุนค่าธรรมเนียม",
+      "แท่งสัดส่วนเงินสด/บัตรเครดิตของยอดขายรวม พร้อมต้นทุนค่าธรรมเนียมบัตรเครดิตจำลองที่อัตรา 2% "
+      "ซึ่งคำนวณต่อจากข้อมูลชุดเดียวกัน แสดงเป็นค่าสรุปโดยไม่ต้องทำกราฟแยก")
+
+pay = q("""
+    select payment_method_key, count(*) as bill_count, sum(total_amount) as total_amount
+    from fact_invoice
+    where gasstation_id = any(?) and date_key between ? and ?
+    group by 1
+""", (S, k0, k1))
+
+if guard(pay):
+    pay["label"] = pay["payment_method_key"].map({"cash": "เงินสด", "credit card": "บัตรเครดิต"})
+    pay["label"] = pay["label"].fillna(pay["payment_method_key"])
+    c1, c2 = st.columns([1.3, 1])
+    with c1:
