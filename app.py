@@ -301,3 +301,45 @@ if guard(perf):
     fig.update_xaxes(title_text="ยอดขายเฉลี่ยต่อวัน (₫)")
     fig.update_yaxes(title_text="")
     st.plotly_chart(style(fig, 420, True), width="stretch")
+
+# ===========================================================================
+# ส่วนที่ 2 — โครงสร้างสินค้าตามสถานี
+# ===========================================================================
+panel("โครงสร้างยอดขายตามชนิดสินค้า",
+      "แท่งสัดส่วน 100% ต่อสถานี แบ่งตามกลุ่มสินค้า (Gasoline / Diesel / Lubricant) "
+      "แสดงสัดส่วนเบนซินเทียบดีเซลของแต่ละสถานี สินค้าที่ขายดีที่สุดของแต่ละสถานี "
+      "ดูได้จากป้ายเมื่อชี้เมาส์บนแท่งที่ใหญ่ที่สุด")
+
+mix = q("""
+    select s.gasstation_id, g.gasstation_name, p.product_type, p.product_name,
+           sum(s.total_price) as sales_value, sum(s.quantity_sold) as liters
+    from fact_sales s
+    join dim_product p on s.product_id = p.product_id
+    join dim_gasstation g on s.gasstation_id = g.gasstation_id
+    where s.gasstation_id = any(?) and s.date_key between ? and ?
+    group by 1, 2, 3, 4
+""", (S, k0, k1))
+
+if guard(mix):
+    top_stations = mix.groupby("gasstation_name")["sales_value"].sum().nlargest(15).index
+    mix_top = mix[mix["gasstation_name"].isin(top_stations)]
+    by_type = (mix_top.groupby(["gasstation_name", "product_type"])["sales_value"]
+               .sum().reset_index())
+    order = (by_type.groupby("gasstation_name")["sales_value"].sum()
+             .sort_values().index.tolist())
+    TYPE_COLOR = {"Gasoline": BLUE, "Diesel": ORANGE, "Lubricant": AQUA}
+    top_product = (mix_top.sort_values("sales_value", ascending=False)
+                   .drop_duplicates("gasstation_name").set_index("gasstation_name")["product_name"])
+    fig = go.Figure()
+    for ptype in ["Gasoline", "Diesel", "Lubricant"]:
+        sub = by_type[by_type["product_type"] == ptype].set_index("gasstation_name").reindex(order)
+        fig.add_trace(go.Bar(
+            x=sub["sales_value"], y=sub.index, orientation="h", name=ptype,
+            marker_color=TYPE_COLOR.get(ptype, MUTED),
+            customdata=[[top_product.get(g, "—")] for g in sub.index],
+            hovertemplate="%{y} · " + ptype + "<br>%{x:,.0f} ₫<br>สินค้าขายดีสุด: %{customdata[0]}"
+                          "<extra></extra>"))
+    fig.update_layout(barmode="stack", legend_title_text="กลุ่มสินค้า")
+    fig.update_xaxes(title_text="ยอดขาย (₫)")
+    fig.update_yaxes(title_text="")
+    st.plotly_chart(style(fig, 460, True), width="stretch")
