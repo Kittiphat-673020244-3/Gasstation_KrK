@@ -43,3 +43,56 @@
 1. **กลุ่มข้อมูลหลักและโครงสร้างสาขา (Master Data & Infrastructure):** `gasstation`, `employee`, `customer`, `product`[cite: 2]
 2. **กลุ่มธุรกรรมงานขาย (Sales Transactions):** `invoice`, `invoicedetail`[cite: 2]
 3. **กลุ่มคลังและการเคลื่อนไหวน้ำมันเชื้อเพลิง (Inventory Transactions):** `storagetank`, `inventorytransaction`[cite: 2]
+
+---
+
+## 2. โครงสร้างโปรเจกต์และกระบวนการ ELT (Project Structure)
+โครงสร้างโปรเจกต์ทั้งหมด
+
+```
+Gasstation_KRK/
+└── Gasstation_dw_duckdb/
+    ├── dbt_project.yml
+    ├── profiles.yml                    # หรืออยู่ที่ ~/.dbt/profiles.yml
+    ├── dev.duckdb                      # ไฟล์ฐานข้อมูลจริง (สร้างอัตโนมัติตอนรันครั้งแรก)
+    │
+    ├── Datasets/                       # ไฟล์ CSV ต้นทาง 8 ไฟล์
+    │   ├── Customer.csv
+    │   ├── Employee.csv
+    │   ├── GasStation.csv
+    │   ├── Product.csv
+    │   ├── Invoice.csv
+    │   ├── InvoiceDetail.csv
+    │   ├── StorageTank.csv
+    │   └── InventoryTransaction.csv
+    │
+    ├── models/
+    │   ├── staging/
+    │   │   ├── src_gas.yml             # ประกาศ source (ชี้ไปที่ CSV)
+    │   │   ├── stg_Customer.sql
+    │   │   ├── stg_Employee.sql
+    │   │   ├── stg_GasStation.sql
+    │   │   ├── stg_Product.sql
+    │   │   ├── stg_Invoice.sql
+    │   │   ├── stg_InvoiceDetail.sql
+    │   │   ├── stg_StorageTank.sql
+    │   │   └── stg_InventoryTransaction.sql
+    │   │
+    │   └── datawarehouse/
+    │       ├── schema.yml
+    │       ├── dim_date.sql
+    │       ├── dim_time.sql
+    │       ├── dim_customer.sql
+    │       ├── dim_employee.sql
+    │       ├── dim_gasstation.sql
+    │       ├── dim_product.sql
+    │       ├── dim_paymentmethod.sql
+    │       ├── dim_tank.sql
+    │       ├── fact_sales.sql
+    │       └── fact_inventory.sql
+    │
+    ├── app.py                          # Streamlit: Database Inspector (dev tool)
+    └── dashboard_app.py                # Streamlit: Executive Dashboard (ตอบ 15 คำถามธุรกิจ)
+```
+---
+
