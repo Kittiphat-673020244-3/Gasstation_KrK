@@ -245,3 +245,59 @@ spread = q("""
     from mart_09_daily_station_ranking
     where date_key between ? and ? and sales_multiple is not null
 """, (k0, k1)).iloc[0].m
+
+c = st.columns(5)
+kpi(c[0], "ยอดขายรวม", f"{cur_k.sales_amount:,.0f}", " ₫")
+kpi(c[1], "ปริมาณน้ำมันที่ขาย", f"{fuel_liters:,.0f}", " ลิตร")
+kpi(c[2], "จำนวนบิล", f"{cur_k.bill_count:,.0f}", " บิล",
+    f"เฉลี่ย {cur_k.sales_amount / cur_k.bill_count:,.0f} ₫/บิล" if cur_k.bill_count else "")
+kpi(c[3], "สถานีขายดีสุด", top_station.iloc[0].gasstation_name if not top_station.empty else "—",
+    sub=f"{top_station.iloc[0].s:,.0f} ₫" if not top_station.empty else "")
+kpi(c[4], "ส่วนต่างยอดขายสูงสุด/ต่ำสุดต่อวัน", f"{spread:,.1f}" if pd.notna(spread) else "—", " เท่า",
+    "เฉลี่ยทั้งระบบ")
+st.write("")
+
+# ===========================================================================
+# ส่วนที่ 1 — ผลการดำเนินงานตามสถานี
+# ===========================================================================
+panel("ผลการดำเนินงานตามสถานี",
+      "แท่งแนวนอนเรียงตามยอดขายเฉลี่ยต่อวันของสถานีในขอบเขตที่เลือก สีไล่ระดับตามกลุ่มยอดขาย "
+      "(สูง/กลาง/ต่ำ) ช่วยอ่านกลุ่มได้เร็วโดยไม่ต้องกดตัวเลข ชื่อถนนของแต่ละสถานีแสดงในป้ายเมื่อชี้เมาส์")
+
+perf = q("""
+    with daily as (
+        select gasstation_id, date_key, sum(total_amount) as daily_sales
+        from fact_invoice
+        where gasstation_id = any(?) and date_key between ? and ?
+        group by 1, 2
+    ),
+    station_avg as (
+        select gasstation_id, avg(daily_sales) as avg_daily_sales
+        from daily group by 1
+    )
+    select s.gasstation_id, g.gasstation_name,
+           trim(split_part(g.address, ',', 1)) as road_name,
+           s.avg_daily_sales,
+           ntile(3) over (order by s.avg_daily_sales desc) as tier_rank
+    from station_avg s join dim_gasstation g on s.gasstation_id = g.gasstation_id
+    order by s.avg_daily_sales desc
+""", (S, k0, k1))
+
+if guard(perf):
+    TIER_LABEL = {1: "กลุ่มสูง", 2: "กลุ่มกลาง", 3: "กลุ่มต่ำ"}
+    TIER_COLOR = {1: SEQ_BLUE[4], 2: SEQ_BLUE[3], 3: SEQ_BLUE[1]}
+    top_n = perf.head(20).sort_values("avg_daily_sales")
+    fig = go.Figure()
+    for tier in [3, 2, 1]:
+        sub = top_n[top_n["tier_rank"] == tier]
+        if sub.empty:
+            continue
+        fig.add_trace(go.Bar(
+            x=sub.avg_daily_sales, y=sub.gasstation_name, orientation="h",
+            name=TIER_LABEL[tier], marker_color=TIER_COLOR[tier],
+            customdata=sub[["road_name"]].values,
+            hovertemplate="%{y}<br>ถนน %{customdata[0]}<br>%{x:,.0f} ₫/วัน<extra></extra>"))
+    fig.update_layout(barmode="overlay", legend_title_text="ระดับยอดขาย")
+    fig.update_xaxes(title_text="ยอดขายเฉลี่ยต่อวัน (₫)")
+    fig.update_yaxes(title_text="")
+    st.plotly_chart(style(fig, 420, True), width="stretch")
