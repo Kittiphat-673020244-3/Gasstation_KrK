@@ -90,7 +90,7 @@
 <p align="center"><em>Operational ER Diagram — คลิกที่ภาพเพื่อเปิดไฟล์ต้นฉบับบน Google Drive</em></p>
 **[เปิดดู Operational ER Diagram บน Google Drive](https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view)**
 
-> **หมายเหตุด้านแหล่งข้อมูล:** ก่อนส่งงานฉบับสุดท้าย ควรเพิ่มลิงก์หน้า Dataset บน Kaggle ที่ตรงกับชุดข้อมูลต้นฉบับ เพื่อให้ตรวจสอบที่มาและเงื่อนไขการใช้งานได้
+> **หมายเหตุด้านแหล่งข้อมูล:** ก่อนส่งงานฉบับสุดท้าย ควรเพิ่มลิงก์หน้า Dataset บนKaggle ที่ตรงกับชุดข้อมูลต้นฉบับ เพื่อให้ตรวจสอบที่มาและเงื่อนไขการใช้งานได้
 
 ## Data Architecture & ELT
 
