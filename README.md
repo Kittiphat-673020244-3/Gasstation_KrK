@@ -206,6 +206,7 @@ Fact table เก็บ **"เหตุการณ์" หรือ "ธุร�
 ## 5. โครงสร้าง Data Cube ของโปรเจกต์นี้
 
 เนื่องจากโปรเจกต์นี้มีตาราง fact มากกว่า 1 ตัว (3 ตัว) ที่ใช้ dimension บางส่วนร่วมกัน (conformed dimensions) รูปแบบ Data Cube ของระบบนี้จึงเป็น **Galaxy Schema** หรือเรียกอีกชื่อว่า **Fact Constellation Schema** (กลุ่มดาวหลายดวงเชื่อมกัน) ไม่ใช่ Star Schema แบบธรรมดาที่มี fact เดียว
+
 **ดู Galaxy Schema (คลิกที่รูปเพื่อเปิด PDF ฉบับเต็ม)**
 
 [![Galaxy Schema](Galaxy_Schema.png)](Galaxy_Schema.pdf)
