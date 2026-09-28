@@ -13,9 +13,11 @@ profile: 'Gasstation_dw_duckdb'
 model-paths: ["models"]
 analysis-paths: ["analyses"]
 test-paths: ["tests"]
-seed-paths: ["seeds"]
+# ให้เหลือบรรทัดนี้แค่จุดเดียว
+seed-paths: ["seeds", "datasets"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
+
 
 clean-targets:         # directories to be removed by dbt clean
   - "target"
