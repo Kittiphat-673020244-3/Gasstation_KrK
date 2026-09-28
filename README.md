@@ -316,7 +316,7 @@ https://krkgas.streamlit.app/   ยังต้องกลับมาแก้
 ---
 
 ## 13. Infographic: สื่อภาพนิ่งสำหรับอธิบายภาพรวมและข้อมูลเชิงลึกของ Dashboard
-มาใส่รูป
+![GasStationDB Infographic](./GasStationDB_Infographic.png)
 
 ---
 
