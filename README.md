@@ -32,19 +32,23 @@
 
 ## Contents
 
-1. [Project Overview](#project-overview)
-2. [Team Members](#team-members)
-3. [Dataset & OLTP](#dataset--oltp)
-4. [Data Architecture & ELT](#data-architecture--elt)
-5. [Star Schema & Data Cube](#star-schema--data-cube)
-6. [Project Structure](#project-structure)
-7. [15 Business Questions](#15-business-questions)
-8. [Interactive Dashboard](#interactive-dashboard)
-9. [Quick Start](#quick-start)
-10. [Technology Stack](#technology-stack)
-11. [Data Limitations & Next Steps](#data-limitations--next-steps)
-12. [License](#license)
-
+- [Project Overview](#project-overview)
+- [Team Members](#team-members)
+1. [Dataset & OLTP](#1-dataset--oltp)
+2. [กระบวนการ ELT (Extract – Load – Transform)](#2-กระบวนการ-elt-extract--load--transform)
+3. [Business Questions 15 ข้อ](#3-business-questions-15-ข้อ)
+4. [แนวคิดพื้นฐาน: Dimension และ Fact คืออะไร](#4-แนวคิดพื้นฐาน-dimension-และ-fact-คืออะไร)
+5. [โครงสร้าง Data Cube ของโปรเจกต์นี้](#5-โครงสร้าง-data-cube-ของโปรเจกต์นี้)
+6. [รายละเอียด Staging Layer](#6-รายละเอียด-staging-layer)
+7. [รายละเอียด Dimension Tables](#7-รายละเอียด-dimension-tables)
+8. [รายละเอียด Bridge Table](#8-รายละเอียด-bridge-table)
+9. [รายละเอียด Fact Tables](#9-รายละเอียด-fact-tables)
+10. [รายละเอียด Intermediate Tables](#10-รายละเอียด-intermediate-tables)
+11. [รายละเอียด Data Mart](#11-รายละเอียด-data-mart)
+12. [ลิงก์ Web Application](#12-ลิงก์-web-applicationไฟล์)
+13. [Infographic](#13-infographic-สื่อภาพนิ่งสำหรับอธิบายภาพรวมและข้อมูลเชิงลึกของ-dashboard)
+14. [Presentation](#14-presentation-เอกสารประกอบการนำเสนอโครงงาน)
+15. [คำแนะนำการเปิดใช้ Codespace](#15-คำแนะนำการเปิดใช้-codespace)
 ---
 
 ## Project Overview
