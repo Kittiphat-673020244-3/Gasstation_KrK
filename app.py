@@ -514,43 +514,96 @@ if guard(tanks):
     st.plotly_chart(style(fig, 460, False), width="stretch")
 
 # ===========================================================================
-# ส่วนที่ 7 — การกระทบยอด จ่ายออก vs ขายจริง
+# ส่วนที่ 7 — ปริมาณนำเข้าและจ่ายออกน้ำมัน
 # ===========================================================================
-panel("ส่วนต่างปริมาณจ่ายออกจากถัง เทียบ ยอดขายจริง",
-      "แท่งสองทิศทางรอบเส้นศูนย์ แท่งเกินศูนย์ (น้ำเงิน) หมายถึงจ่ายออกมากกว่าขาย "
-      "แท่งต่ำกว่าศูนย์ (แดง) หมายถึงขายมากกว่าที่บันทึกว่าจ่ายออก ซึ่งเป็นจุดที่ควรตรวจสอบเพิ่มเติม")
+panel("ปริมาณนำเข้าและจ่ายออกน้ำมัน",
+      "สีฟ้าเหนือเส้นศูนย์ = นำเข้าน้ำมัน · สีแดงใต้เส้นศูนย์ = จ่ายออกน้ำมัน "
+      "แสดงปริมาณเข้าและออกแยกกัน ไม่หักลบเป็นยอดสุทธิ · หน่วยลิตร")
 
-recon = q("""
-    with sold as (
-        select date_key, sum(quantity_sold) as qty_sold
-        from fact_sales where gasstation_id = any(?) and product_id = any(?)
-          and date_key between ? and ? group by 1
-    ),
-    dispensed as (
-        select date_key, sum(quantity_out) as qty_out
-        from fact_inventory_transaction
-        where gasstation_id = any(?) and date_key between ? and ? group by 1
+inventory_flow = q("""
+    select f.date_key, f.product_id,
+           coalesce(sum(f.quantity_in), 0) as qty_in,
+           coalesce(sum(f.quantity_out), 0) as qty_out
+    from fact_inventory_transaction f
+    join dim_product p on f.product_id = p.product_id
+    where p.is_fuel
+      and f.gasstation_id = any(?) and f.product_id = any(?)
+      and f.date_key between ? and ?
+    group by 1, 2
+    order by 1, 2
+""", (S, P, k0, k1))
+
+
+def inventory_flow_chart(data: pd.DataFrame, x_column: str,
+                         daily: bool = False) -> go.Figure:
+    """Show receipts above zero and issues below zero, without netting flows."""
+    fig = go.Figure()
+    date_hover = "%{x|%d %b %Y}" if daily else "%{x}"
+    for column, label, color, direction in [
+        ("qty_in", "นำเข้าน้ำมัน", "#38a5ff", 1),
+        ("qty_out", "จ่ายออกน้ำมัน", "#f56b70", -1),
+    ]:
+        quantity = data[column].abs()
+        fig.add_trace(go.Bar(
+            x=data[x_column], y=quantity * direction,
+            name=label, marker=dict(color=color, line_width=0),
+            customdata=quantity.to_numpy().reshape(-1, 1),
+            hovertemplate=date_hover + "<br>" + label +
+                          " %{customdata[0]:,.2f} ลิตร<extra></extra>",
+            **({"width": 24 * 60 * 60 * 1000 * 0.8} if daily else {})))
+
+    # A shared scale places zero in the middle even for one-direction-only data.
+    max_quantity = max(float(data.qty_in.abs().max()),
+                       float(data.qty_out.abs().max()), 1.0)
+    fig.update_layout(
+        height=400, margin=dict(l=12, r=22, t=48, b=16),
+        paper_bgcolor="#071020", plot_bgcolor="#071020",
+        font=dict(family="IBM Plex Sans Thai, IBM Plex Sans, sans-serif",
+                  color="#b8c8df", size=12),
+        hoverlabel=dict(bgcolor="#102039", font_color="#f1f5f9"),
+        barmode="relative", bargap=0.2,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0),
     )
-    select coalesce(s.date_key, d.date_key) as date_key,
-           coalesce(s.qty_sold, 0) as qty_sold, coalesce(d.qty_out, 0) as qty_out,
-           coalesce(d.qty_out, 0) - coalesce(s.qty_sold, 0) as variance
-    from sold s full outer join dispensed d on s.date_key = d.date_key
-    order by 1
-""", (S, P, k0, k1, S, k0, k1))
+    fig.update_xaxes(showgrid=False, zeroline=False, title_text="",
+                     automargin=True)
+    fig.update_yaxes(title_text="ปริมาณน้ำมัน (ลิตร)",
+                     range=[-max_quantity * 1.12, max_quantity * 1.12],
+                     gridcolor="#1c293e", zeroline=True,
+                     zerolinecolor="#9cacc2", zerolinewidth=1.5,
+                     tickformat="~s", automargin=True)
+    if daily:
+        fig.update_xaxes(type="date", tickformat="%d %b\n%Y", nticks=6)
+    else:
+        fig.update_xaxes(type="category", categoryorder="array",
+                         categoryarray=data[x_column].tolist())
+    return fig
 
-if guard(recon):
-    recon["date_day"] = pd.to_datetime(recon["date_key"], format="%Y%m%d")
-    fig = go.Figure(go.Bar(
-        x=recon.date_day, y=recon.variance,
-        marker_color=[BLUE if v >= 0 else RED_HUE for v in recon.variance],
-        customdata=recon[["qty_sold", "qty_out"]].values,
-        hovertemplate="%{x|%d %b}<br>ส่วนต่าง %{y:+,.0f} ลิตร<br>ขาย %{customdata[0]:,.0f} · "
-                      "จ่ายออก %{customdata[1]:,.0f}<extra></extra>"))
-    fig.add_hline(y=0, line_color=BASELINE, line_width=1.5)
-    fig.update_xaxes(title_text="")
-    fig.update_yaxes(title_text="ส่วนต่าง (ลิตร) = จ่ายออก − ขาย")
-    st.plotly_chart(style(fig, 340, False), width="stretch")
-    st.caption("หมายเหตุ: ส่วนต่างเป็นจุดให้ตรวจสอบเพิ่มเติม ไม่ใช่ข้อสรุปว่ามีน้ำมันสูญหายเสมอไป")
+
+if guard(inventory_flow):
+    daily_flow = inventory_flow.groupby("date_key", as_index=False)[["qty_in", "qty_out"]].sum()
+    daily_flow["date_day"] = pd.to_datetime(daily_flow["date_key"], format="%Y%m%d")
+    product_flow = inventory_flow.groupby("product_id", as_index=False)[["qty_in", "qty_out"]].sum()
+    product_flow = product_flow.merge(dim_prod[["product_id", "product_name"]],
+                                      on="product_id", how="left")
+    product_flow["product_label"] = (product_flow["product_name"].fillna("สินค้า") +
+                                     " · " + product_flow.product_id.astype(str))
+    left, right = st.columns([1.55, 1], gap="small")
+    with left:
+        st.markdown("#### นำเข้าและจ่ายออกน้ำมันรายวัน")
+        st.plotly_chart(inventory_flow_chart(daily_flow, "date_day", daily=True),
+                        width="stretch")
+    with right:
+        st.markdown("#### นำเข้าและจ่ายออกแยกตามสินค้า")
+        st.plotly_chart(inventory_flow_chart(product_flow, "product_label"),
+                        width="stretch")
+    st.caption("ปริมาณจ่ายออกแสดงใต้เส้นศูนย์เพื่อบอกทิศทางการไหลออก "
+               "ตัวเลขเมื่อชี้เมาส์แสดงปริมาณจริงเป็นค่าบวก · "
+               "อ้างอิง quantity_in และ quantity_out จาก fact_inventory_transaction")
+    if not (daily_flow.qty_in != 0).any():
+        st.info("ช่วงที่เลือกไม่มีปริมาณนำเข้าน้ำมัน จึงไม่มีแท่งสีฟ้า")
+    if not (daily_flow.qty_out != 0).any():
+        st.info("ช่วงที่เลือกไม่มีปริมาณจ่ายออกน้ำมัน จึงไม่มีแท่งสีแดง")
+
 
 st.markdown(f'<div style="text-align:center;color:{MUTED};font-size:.78rem;padding-top:18px;'
             f'border-top:1px solid {BORDER};margin-top:22px">Fuel Station Analytics Report · '
