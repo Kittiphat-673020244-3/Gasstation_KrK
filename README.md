@@ -310,7 +310,7 @@ Fact table เก็บ **"เหตุการณ์" หรือ "ธุร�
 
 ---
 ## 12. ลิงก์ Web Applicationไฟล์
-https://krkgas.streamlit.app/   ยังต้องกลับมาแก้ เนื่องจากอันสุดท้ายไม่ขึ้น
+https://gas-krk.streamlit.app/
 ตรงนี้แก้ต้องมาใส่รูปภาพคิวอาโค้ด 
 
 ---
