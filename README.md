@@ -22,7 +22,7 @@
   <a href="https://drive.google.com/file/d/1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq/view?usp=sharing"><strong>Data Cube / Star Schema</strong></a>
 </p>
 
-> **Repository:** [Gasstation_KrK](https://github.com/Kittiphat-673020244-3/Gasstation_KrK#project-overview)  
+> **Repository:** [Gasstation_KrK](https://github.com/Kittiphat-673020244-3/Gasstation_KrK)  
 > **Group:** Project Group 1  
 > **Course:** SC663402 — Data Warehouse and Big Data Analytics
 
