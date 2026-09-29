@@ -64,14 +64,15 @@
 
 ## Team Members
 
-| รหัสนักศึกษา | ชื่อ–นามสกุล | บทบาท |
+| รหัสนักศึกษา | ชื่อ–นามสกุล | หน้าที่ |
 |:---:|:---|:---|
-| **673020045-9** | นายประภากร มีใส | Project Lead & Data Architect |
-| **673020244-3** | นายกิตติพัศ ลาล้ำ | Data Engineer |
-| **673020256-6** | นางสาวปภาวดี เหมาะดี | Data Analyst Lead |
-| **673020264-7** | นางสาวสุกัญญา อุดมกัน | Data Modeler |
-| **673020266-3** | นางสาวสุพิชญา ผ่องสนาม | Data Quality Engineer |
-| **673020270-2** | นางสาวอาทิติญา ชาชัย | Business Intelligence Analyst |
+| **673020045-9** | นายประภากร มีใส | สร้าง Virtual Environment, data warehouse ,ไฟล์ตาราง Dimension, สร้าง query_duckdb.py |
+| **673020244-3** | นายกิตติพัศ ลาล้ำ | สร้าง Github project ,เพิ่มข้อมูลในreadme ,ทำสไลด์presentation |
+| **673020256-6** | นางสาวปภาวดี เหมาะดี |ทำ web app, ทำ infographic |
+| **673020264-7** | นางสาวสุกัญญา อุดมกัน | กำหนด Business Model 1-15,ทำสไลด์presentation, ทำinfographic   |
+| **673020266-3** | นางสาวสุพิชญา ผ่องสนาม | เพิ่มข้อมูลในreadme ,ทำสไลด์presentation |
+| **673020270-2** | นางสาวอาทิติญา ชาชัย | เพิ่มข้อมูลในreadme ,
+ทำสไลด์presentation |
 
 ## 1. Dataset & OLTP
 
