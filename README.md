@@ -311,7 +311,9 @@ Fact table เก็บ **"เหตุการณ์" หรือ "ธุร�
 ---
 ## 12. ลิงก์ Web Applicationไฟล์
 https://gas-krk.streamlit.app/
-ตรงนี้แก้ต้องมาใส่รูปภาพคิวอาโค้ด 
+
+![QR Code](https://github.com/user-attachments/assets/f96e68db-4d03-4cca-9db1-aebdbd059c7e)
+
 
 ---
 
