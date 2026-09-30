@@ -95,9 +95,12 @@
 </p>
 
 <p align="center"><em>Operational ER Diagram — คลิกที่ภาพเพื่อเปิดไฟล์ต้นฉบับบน Google Drive</em></p>
-**[เปิดดู Operational ER Diagram บน Google Drive](https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view)**
+
+[**[เปิดดู Operational ER Diagram บน Google Drive]**](https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view)
+
 
 **แหล่งข้อมูล:** https://www.kaggle.com/datasets/ren294/gasstationdb-hcmcity-postgres?resource=download
+
 
 ---
 
