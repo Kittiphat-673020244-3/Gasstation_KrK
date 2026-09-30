@@ -66,12 +66,12 @@
 
 | รหัสนักศึกษา | ชื่อ–นามสกุล | หน้าที่ |
 |:---:|:---|:---|
-| **673020045-9** | นายประภากร มีใส | สร้าง Virtual Environment, สร้าง query_duckdb.py, Data Model Diagram, presentation, Multidimensional Data Model, สร้าง project dbt, เพิ่มข้อมูลใน readme |
-| **673020244-3** | นายกิตติพัศ ลาล้ำ | สร้าง Github project, เพิ่มข้อมูลใน readme, presentation, staging,  ER Diagram,  Multidimensional Data Model |
-| **673020256-6** | นางสาวปภาวดี เหมาะดี | Dashboard, infographic, Data Model Diagram, กระบวนการ ETL/ELT,  Multidimensional Data Model |
-| **673020264-7** | นางสาวสุกัญญา อุดมกัน | กำหนดBusiness Model 1-8, presentation, infographic, Multidimensional Data Model |
-| **673020266-3** | นางสาวสุพิชญา ผ่องสนาม | เพิ่มข้อมูลในreadme, presentation, ER Diagram, datawarehouse, Data Model Diagram,  Multidimensional Data Model |
-| **673020270-2** | นางสาวอาทิติญา ชาชัย | กำหนดBusiness Model 9-15, เพิ่มข้อมูลในreadme, presentation, datawarehouse, Multidimensional Data Model |
+| **673020045-9**  | นายประภากร มีใส | สร้าง Virtual Environment, สร้าง query_duckdb.py, Data Model Diagram, presentation, Multidimensional Data Model, สร้าง project dbt, เพิ่มข้อมูลใน readme |
+| **673020244-3**  | นายกิตติพัศ ลาล้ำ | สร้าง Github project, เพิ่มข้อมูลใน readme, presentation, staging,  ER Diagram,  Multidimensional Data Model |
+| **673020256-6**  | นางสาวปภาวดี เหมาะดี | Dashboard, infographic, Data Model Diagram, กระบวนการ ETL/ELT,  Multidimensional Data Model |
+| **673020264-7**  | นางสาวสุกัญญา อุดมกัน | กำหนดBusiness Model 1-8, presentation, infographic, Multidimensional Data Model |
+| **673020266-3**  | นางสาวสุพิชญา ผ่องสนาม | เพิ่มข้อมูลในreadme, presentation, ER Diagram, datawarehouse, Data Model Diagram,  Multidimensional Data Model |
+| **673020270-2**  | นางสาวอาทิติญา ชาชัย | กำหนดBusiness Model 9-15, เพิ่มข้อมูลในreadme, presentation, datawarehouse, Multidimensional Data Model |
 
 ## 1. Dataset & OLTP
 
