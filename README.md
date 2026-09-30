@@ -71,7 +71,7 @@
 | **673020256-6** | นางสาวปภาวดี เหมาะดี |Dashboard, infographic, Data Model Diagram, กระบวนการ ETL/ELT, Multidimensional Data Model |
 | **673020264-7** | นางสาวสุกัญญา อุดมกัน | กำหนด Business Model 1-15, presentation, infographic, Multidimensional Data Model   |
 | **673020266-3** | นางสาวสุพิชญา ผ่องสนาม | เพิ่มข้อมูลในreadme, presentation, ER Diagram, datawarehouse, Data Model Diagram, Multidimensional Data Model |
-| **673020270-2** | นางสาวอาทิติญา ชาชัย | เพิ่มข้อมูลในreadme, presentation, datawarehouse, Multidimensional Data Model|
+| **673020270-2** | นางสาวอาทิติญา ชาชัย | กำหนดBusiness Model 9-15, เพิ่มข้อมูลในreadme, presentation, datawarehouse, Multidimensional Data Model|
 
 ## 1. Dataset & OLTP
 
