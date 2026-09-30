@@ -327,8 +327,8 @@ https://canva.link/gas-station-krk
 
 ## 15. คำแนะนำการเปิดใช้ Codespace
 1. ติดตั้ง python3 `-m venv .venv`
-2. เปิด `source .venv/bin/activate`
-3. ติดตั้งไลบรารีที่จำเป็น: `pip install -r requirements.txt`
-4. เข้าโฟลเดอร์โปรเจกต์ dbt: `cd Gasstation_dw_duckdb`
-5. ลองรัน `dbt debug` และ `dbt run`
-6. เปิดแดชบอร์ด : `cd ..` แล้วรัน  `streamlit run app.py`
+2. เปิด  `source .venv/bin/activate`
+3. ติดตั้งไลบรารีที่จำเป็น:  `pip install -r requirements.txt`
+4. เข้าโฟลเดอร์โปรเจกต์ dbt:  `cd Gasstation_dw_duckdb`
+5. ลองรัน  `dbt debug` และ `dbt run`
+6. เปิดแดชบอร์ด :  `cd ..` แล้วรัน  `streamlit run app.py`
