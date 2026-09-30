@@ -319,7 +319,7 @@ https://gas-krk.streamlit.app/
 ---
 
 ## 13. Infographic: สื่อภาพนิ่งสำหรับอธิบายภาพรวมและข้อมูลเชิงลึกของ Dashboard
-![GasStationDB Infographic](./GasStationDB_Infographic.png)
+<img width="800" height="2000" alt="image" src="https://github.com/user-attachments/assets/fdb4e59f-721a-4fe9-a6e7-5f066fd6f906" />
 
 ---
 
