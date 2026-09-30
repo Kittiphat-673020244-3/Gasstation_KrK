@@ -271,7 +271,7 @@ Fact table เก็บ **"เหตุการณ์" หรือ "ธุร�
 
 ---
 
-## 9. รายละเอียด Fact Tables
+## 9.  รายละเอียด Fact Tables
 
 * **`fact_invoice`** (grain: 1 แถวต่อ 1 ใบเสร็จ): โหลดข้อมูลหัวใบเสร็จจาก `stg_Invoice`, คำนวณ `date_key` และ `hour_of_day` จาก `IssueDate`, เก็บ `gasstation_id`/`customer_id`/`employee_id` เป็น foreign key และ `total_amount` เป็น measure, แปลง `PaymentMethod` เป็น `payment_method_key` (ตัวพิมพ์เล็ก) แล้วกรองแถวที่ `invoice_id` เป็นค่าว่างออก
 * **`fact_sales`** (grain: 1 แถวต่อ 1 รายการสินค้าในใบเสร็จ): รวมข้อมูลรายการสินค้าจาก `stg_InvoiceDetail` เข้ากับข้อมูลหัวใบเสร็จจาก `stg_Invoice` (join ด้วย `InvoiceID`) เพื่อดึง `date_key`, `hour_of_day`, `gasstation_id`, `customer_id`, `employee_id` และ `payment_method_key` มาด้วย, เก็บ `quantity_sold`, `unit_price`, `total_price` เป็น measure และ `product_id` เป็น foreign key แล้วกรองแถวที่ `invoice_detail_id` เป็นค่าว่างออก
@@ -317,12 +317,12 @@ https://gas-krk.streamlit.app/
 
 ---
 
-## 13. Infographic: สื่อภาพนิ่งสำหรับอธิบายภาพรวมและข้อมูลเชิงลึกของ Dashboard
+## 13.  Infographic: สื่อภาพนิ่งสำหรับอธิบายภาพรวมและข้อมูลเชิงลึกของ Dashboard
 ![GasStationDB Infographic](./GasStationDB_Infographic.png)
 
 ---
 
-## 14. Presentation: เอกสารประกอบการนำเสนอโครงงาน
+## 14.  Presentation: เอกสารประกอบการนำเสนอโครงงาน
 https://canva.link/gas-station-krk
 
 ## 15. คำแนะนำการเปิดใช้ Codespace
