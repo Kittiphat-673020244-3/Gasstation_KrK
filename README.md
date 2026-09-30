@@ -331,4 +331,4 @@ https://canva.link/gas-station-krk
 3. ติดตั้งไลบรารีที่จำเป็น: `pip install -r requirements.txt`
 4. เข้าโฟลเดอร์โปรเจกต์ dbt: `cd Gasstation_dw_duckdb`
 5. ลองรัน `dbt debug` และ `dbt run`
-6. เปิดแดชบอร์ด ): `cd ..` แล้วรัน  `streamlit run app.py`
+6. เปิดแดชบอร์ด : `cd ..` แล้วรัน  `streamlit run app.py`
