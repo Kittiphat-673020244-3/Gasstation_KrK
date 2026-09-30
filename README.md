@@ -325,8 +325,7 @@ https://gas-krk.streamlit.app/
 ---
 
 ## 14.  Presentation: เอกสารประกอบการนำเสนอโครงงาน
-https://canva.link/gas-station-krk
-
+https://canva.link/bymk1d8urq0zvt0
 ## 15. คำแนะนำการเปิดใช้ Codespace
 1. ติดตั้ง python3 `-m venv .venv`
 2. เปิด  `source .venv/bin/activate`
