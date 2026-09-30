@@ -19,7 +19,7 @@
   &nbsp;·&nbsp;
   <a href="https://drive.google.com/file/d/1JGIX7BkISNF0DNA6mARoEywLSQCLhmJH/view"><strong>OLTP ER Diagram</strong></a>
   &nbsp;·&nbsp;
-  <a href="https://drive.google.com/file/d/1p_veBgEP3hKBFL9z522rmi3cKWPJ4uxq/view?usp=sharing"><strong>Data Cube / Star Schema</strong></a>
+  <a href="https://drive.google.com/file/d/143ryY0SJkTJuk1uh3v7LTZ3MBZjiTNme/view?usp=sharing"><strong>Data Cube / Galaxy Schema</strong></a>
 </p>
 
 > **Repository:** [Gasstation_KrK](https://github.com/Kittiphat-673020244-3/Gasstation_KrK)  
