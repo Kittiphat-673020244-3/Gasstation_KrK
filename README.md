@@ -210,7 +210,8 @@ Fact table เก็บ **"เหตุการณ์" หรือ "ธุร�
 
 **ดู Galaxy Schema (คลิกที่รูปเพื่อเปิด PDF ฉบับเต็ม)**
 
-[![Galaxy Schema](Galaxy_Schema.png)](Galaxy_Schema.pdf)
+<img width="2000" height="1125" alt="image" src="https://github.com/user-attachments/assets/c69ce349-51fd-4c10-8168-767821eff9e8" />
+
 
 ### 5.1 ตาราง Fact ทั้ง 3 ตัว
 
